@@ -36,13 +36,13 @@ export default function Login() {
 
   return (
     <div className="min-h-full grid lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col justify-between bg-[#0B1020] text-white p-12 relative overflow-hidden">
+      <div className="hidden lg:flex flex-col justify-between bg-[#0E1117] text-white p-12 relative overflow-hidden">
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-md bg-[#6366F1] flex items-center justify-center"><div className="h-4 w-4 rounded-full border-[2.5px] border-white" /></div>
+          <div className="h-8 w-8 rounded-lg bg-[#161B26] ring-1 ring-white/10 flex items-center justify-center"><div className="h-4 w-4 rounded-full border-[2.5px] border-[#5EEAD4]" /></div>
           <span className="font-semibold text-lg">WorkLens</span>
         </div>
         <div className="max-w-md">
-          <h1 className="text-3xl font-semibold tracking-tight leading-tight">Make every contribution visible.</h1>
+          <h1 className="font-display text-4xl font-semibold tracking-tight leading-tight">Make every contribution visible.</h1>
           <p className="mt-3 text-white/60 leading-relaxed">WorkLens doesn’t measure how busy you look. It measures what you actually contribute — from real records, with every score explained.</p>
           <ul className="mt-8 space-y-4 text-sm">
             {[
@@ -52,7 +52,7 @@ export default function Login() {
               [Sparkles, 'Grounded AI', 'Summaries only from your own records'],
             ].map(([Icon, t, d]) => {
               const I = Icon as React.ElementType;
-              return <li key={t as string} className="flex gap-3"><span className="h-8 w-8 rounded-md bg-white/5 border border-white/10 flex items-center justify-center shrink-0"><I size={15} className="text-[#A5B4FC]" /></span><span><span className="font-medium">{t as string}</span><span className="block text-white/50 text-xs mt-0.5">{d as string}</span></span></li>;
+              return <li key={t as string} className="flex gap-3"><span className="h-8 w-8 rounded-md bg-white/5 border border-white/10 flex items-center justify-center shrink-0"><I size={15} className="text-[#5EEAD4]" /></span><span><span className="font-medium">{t as string}</span><span className="block text-white/50 text-xs mt-0.5">{d as string}</span></span></li>;
             })}
           </ul>
         </div>
@@ -63,7 +63,7 @@ export default function Login() {
         <Button variant="ghost" size="icon" onClick={toggle} className="absolute top-4 right-4" aria-label="Toggle theme">{theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</Button>
         <div className="w-full max-w-sm">
           <div className="lg:hidden flex items-center gap-2 mb-8">
-            <div className="h-8 w-8 rounded-md bg-accent flex items-center justify-center"><div className="h-4 w-4 rounded-full border-[2.5px] border-white" /></div>
+            <div className="h-8 w-8 rounded-lg bg-[#0E1117] flex items-center justify-center"><div className="h-4 w-4 rounded-full border-[2.5px] border-[#5EEAD4]" /></div>
             <span className="font-semibold text-lg">WorkLens</span>
           </div>
           <h2 className="text-xl font-semibold tracking-tight">Sign in</h2>

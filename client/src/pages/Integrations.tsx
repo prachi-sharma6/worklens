@@ -83,7 +83,7 @@ export default function IntegrationsPage() {
 function ViasocketHero() {
   return (
     <div className="card overflow-hidden">
-      <div className="grid md:grid-cols-[1fr_auto] gap-4 p-5 bg-gradient-to-br from-accent-soft/70 to-transparent">
+      <div className="grid md:grid-cols-[1fr_auto] gap-4 p-5 bg-accent-soft/40">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-wider text-accent flex items-center gap-1.5"><Sparkles size={12} />Powered by viaSocket</p>
           <h2 className="text-lg font-semibold mt-1 tracking-tight">One connection layer for AI and 2,300+ apps</h2>

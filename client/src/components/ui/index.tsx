@@ -10,8 +10,8 @@ export const cx = clsx;
 // ---------- Button ----------
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle';
 const VARIANT: Record<Variant, string> = {
-  primary: 'bg-accent text-accent-fg hover:bg-accent/90 shadow-sm',
-  secondary: 'bg-surface border border-border text-fg hover:bg-subtle shadow-sm',
+  primary: 'bg-accent text-accent-fg hover:bg-accent/90',
+  secondary: 'bg-surface border border-border text-fg hover:bg-subtle',
   ghost: 'text-muted hover:text-fg hover:bg-subtle',
   subtle: 'bg-subtle text-fg hover:bg-border/60',
   danger: 'bg-danger text-white hover:bg-danger/90 shadow-sm',
@@ -22,8 +22,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLBut
       ref={ref}
       disabled={disabled || loading}
       className={cx(
-        'inline-flex items-center justify-center gap-1.5 rounded-md font-medium transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed select-none',
-        size === 'sm' ? 'h-7 px-2.5 text-xs' : size === 'icon' ? 'h-8 w-8' : 'h-9 px-3.5 text-sm',
+        'inline-flex items-center justify-center gap-1.5 rounded-full font-medium transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed select-none',
+        size === 'sm' ? 'h-7 px-3 text-xs' : size === 'icon' ? 'h-8 w-8' : 'h-9 px-4 text-sm',
         VARIANT[variant], className,
       )}
       {...rest}
@@ -57,7 +57,7 @@ export function Stat({ label, value, hint, tone, icon }: { label: string; value:
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between text-xs text-muted"><span>{label}</span>{icon && <span className="text-faint">{icon}</span>}</div>
-      <div className={cx('mt-1.5 text-2xl font-semibold tnum tracking-tight', toneCls)}>{value}</div>
+      <div className={cx('mt-1.5 font-display text-3xl font-semibold tnum tracking-tight', toneCls)}>{value}</div>
       {hint && <div className="mt-0.5 text-xs text-faint">{hint}</div>}
     </div>
   );
@@ -251,7 +251,7 @@ export function barColor(v: number | null | undefined) {
 export function MiniBar({ value, label }: { value: number | null; label?: string }) {
   return (
     <div className="flex items-center gap-1.5" title={`${label ?? ''} ${value == null ? 'Not enough data' : value}`}>
-      <div className="h-1.5 w-10 rounded-full bg-subtle overflow-hidden"><div className={cx('h-full rounded-full', barColor(value))} style={{ width: `${value ?? 0}%` }} /></div>
+      <div className="h-1.5 w-10 rounded-full bg-subtle overflow-hidden"><div className={cx('h-full rounded-full bar-grow', barColor(value))} style={{ width: `${value ?? 0}%` }} /></div>
     </div>
   );
 }
@@ -262,10 +262,10 @@ export function ScoreRing({ value, size = 88, provisional }: { value: number | n
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgb(var(--subtle))" strokeWidth={7} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={stroke} strokeWidth={7} strokeLinecap="round" strokeDasharray={`${(pctv / 100) * c} ${c}`} strokeDashoffset={0} className="transition-all duration-200" strokeOpacity={provisional ? 0.6 : 1} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={stroke} strokeWidth={7} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pctv / 100)} className="ring-anim" style={{ ['--ring-c' as string]: c } as React.CSSProperties} strokeOpacity={provisional ? 0.6 : 1} />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-xl font-semibold tnum">{value ?? '—'}</span>
+        <span className="font-display text-2xl font-semibold tnum">{value ?? '—'}</span>
         {provisional && <span className="text-[9px] uppercase tracking-wide text-warning font-semibold">Provisional</span>}
       </div>
     </div>

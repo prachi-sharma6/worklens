@@ -8,7 +8,7 @@ import { errMsg, useToast } from '@/context';
 import { DIM_LABEL, DIMS, fmtDate, relTime } from '@/lib/format';
 
 const OVERALL_FORMULA = 'Weighted average of the five dimensions using the weights in Settings. Dimensions with fewer than 3 data points are dropped and the remaining weights re-normalised. Marked Provisional when fewer than 5 eligible tasks or fewer than 2 reviewed tasks exist.';
-export const DIM_COLORS: Record<Dimension, string> = { productivity: '#6366F1', quality: '#10B981', impact: '#F59E0B', consistency: '#0EA5E9', ownership: '#EC4899' };
+export const DIM_COLORS: Record<Dimension, string> = { productivity: '#14B8A6', quality: '#22C55E', impact: '#F59E0B', consistency: '#60A5FA', ownership: '#A78BFA' };
 
 /** Overall ring + five dimension cards with formula popovers and (for managers) an override control. */
 export function ScoreOverview({ view, canOverride, onChanged }: { view: PerformanceView; canOverride?: boolean; onChanged?: () => void }) {
@@ -46,7 +46,7 @@ export function ScoreOverview({ view, canOverride, onChanged }: { view: Performa
                 {s.value == null && <span className="text-xs text-faint">Not enough data</span>}
                 {dd != null && dd !== 0 && <span className={cx('text-xs tnum', dd > 0 ? 'text-success' : 'text-danger')}>{dd > 0 ? '+' : ''}{dd}</span>}
               </div>
-              <div className="h-1.5 rounded-full bg-subtle mt-2 overflow-hidden"><div className={cx('h-full rounded-full', barColor(s.value))} style={{ width: `${s.value ?? 0}%` }} /></div>
+              <div className="h-1.5 rounded-full bg-subtle mt-2 overflow-hidden"><div className={cx('h-full rounded-full bar-grow', barColor(s.value))} style={{ width: `${s.value ?? 0}%` }} /></div>
               <p className="text-[11px] text-muted mt-2 line-clamp-2 min-h-[2.2em]">{s.explanation[0]}</p>
               {s.override && <Badge tone="accent" className="mt-1.5">Adjusted by manager · was {s.override.original_value ?? '—'}</Badge>}
               <div className="mt-2"><ScoreInfo dimension={d} score={s} formula={view.formulas[d]} /></div>

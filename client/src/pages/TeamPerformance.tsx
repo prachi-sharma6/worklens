@@ -7,7 +7,7 @@ import { cap, DIM_LABEL, DIMS, fmtDate } from '@/lib/format';
 import { useAsync, useDataChanged } from '@/lib/hooks';
 
 const tooltipStyle = { background: 'rgb(var(--surface))', border: '1px solid rgb(var(--border))', borderRadius: 8, fontSize: 12 };
-const PERSON_COLORS = ['#6366F1', '#10B981', '#F59E0B', '#0EA5E9', '#EC4899', '#8B5CF6', '#EF4444'];
+const PERSON_COLORS = ['#14B8A6', '#A78BFA', '#F59E0B', '#60A5FA', '#F472B6', '#22C55E', '#F87171'];
 
 export default function TeamPerformance() {
   const { data, error, loading, reload } = useAsync(() => api.team.performance(), []);

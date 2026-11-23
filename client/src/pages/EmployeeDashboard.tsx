@@ -17,6 +17,39 @@ const ATTENTION: Record<DashboardSummary['attention'][number]['kind'], { label: 
   no_evidence: { label: 'No evidence', tone: 'warning', action: 'Add evidence', hint: () => 'Completed but not reviewable until evidence is added' },
 };
 
+/** "Focus now": the most urgent in-progress task (else the next planned one), with today's plan completion as a ring. */
+function FocusCard({ data }: { data: DashboardSummary }) {
+  const open = (t: TaskWithMeta) => t.status !== 'completed';
+  const byDeadline = (a: TaskWithMeta, b: TaskWithMeta) => (a.deadline ?? '9').localeCompare(b.deadline ?? '9');
+  const pool = [...data.planned_today, ...data.upcoming].filter(open);
+  const focus = pool.filter((t) => t.status === 'in_progress').sort(byDeadline)[0] ?? pool.filter((t) => t.status === 'not_started').sort(byDeadline)[0];
+  if (!focus) return null;
+  const pct = data.completion_pct ?? 0;
+  const r = 44, c = 2 * Math.PI * r;
+  return (
+    <section className="card p-5 sm:p-6 flex flex-col sm:flex-row gap-5 sm:items-center">
+      <svg width="104" height="104" viewBox="0 0 104 104" role="img" aria-label={`Today’s plan ${pct}% done`} className="shrink-0">
+        <circle cx="52" cy="52" r={r} fill="none" stroke="rgb(var(--subtle))" strokeWidth="8" />
+        <circle cx="52" cy="52" r={r} fill="none" stroke="rgb(var(--accent))" strokeWidth="8" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} transform="rotate(-90 52 52)" className="ring-anim" style={{ ['--ring-c' as string]: c } as React.CSSProperties} />
+        <text x="52" y="50" textAnchor="middle" fill="rgb(var(--fg))" className="font-display" fontSize="22" fontWeight="600">{data.completion_pct == null ? '—' : `${pct}%`}</text>
+        <text x="52" y="66" textAnchor="middle" fill="rgb(var(--faint))" fontSize="10">of today</text>
+      </svg>
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-accent">Focus now</p>
+        <p className="font-display text-xl font-semibold mt-1 leading-snug">{focus.title}</p>
+        <p className="text-sm text-muted mt-1">
+          {focus.expected_outcome ? <>Done when: {focus.expected_outcome}</> : 'Add an expected outcome so this can be verified.'}
+          <span className={cx('ml-2', focus.is_overdue ? 'text-danger' : 'text-faint')}>· {dueLabel(focus.deadline)}</span>
+        </p>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <Link to={`/tasks/${focus.id}`}><Button variant="primary">{focus.status === 'in_progress' ? 'Finish with evidence' : 'Start it'}</Button></Link>
+          <Link to={`/tasks/${focus.id}`}><Button>I’m blocked</Button></Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function EmployeeDashboard() {
   const { user } = useAuth();
   const { openComposer } = useUI();
@@ -30,7 +63,7 @@ export default function EmployeeDashboard() {
 
   const first = user!.name.split(' ')[0];
   const today = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
-  const nowDoing = data.planned_today.filter((t) => t.status === 'in_progress');
+  const nowDoing = [...new Map([...data.planned_today, ...data.upcoming].filter((t) => t.status === 'in_progress').map((t) => [t.id, t])).values()];
   const isWeekend = [0, 6].includes(new Date().getDay());
 
   return (
@@ -46,6 +79,8 @@ export default function EmployeeDashboard() {
         <Button variant="primary" className="h-10 px-4" onClick={openComposer} icon={<Plus size={16} />}>Add Task</Button>
       </div>
 
+      <FocusCard data={data} />
+
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <Stat label="Planned today" value={data.planned_count} icon={<ListTodo size={15} />} />
         <Stat label="Completed today" value={data.completed_today} tone="success" icon={<CheckCircle2 size={15} />} />
@@ -54,7 +89,7 @@ export default function EmployeeDashboard() {
         <div className="card p-4 col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between text-xs text-muted"><span>Today’s plan done</span></div>
           <div className="mt-1.5 text-2xl font-semibold tnum">{data.completion_pct == null ? '—' : `${data.completion_pct}%`}</div>
-          <div className="h-1.5 rounded-full bg-subtle mt-2 overflow-hidden"><div className="h-full bg-accent rounded-full transition-all" style={{ width: `${data.completion_pct ?? 0}%` }} /></div>
+          <div className="h-1.5 rounded-full bg-subtle mt-2 overflow-hidden"><div className="h-full bg-accent rounded-full bar-grow" style={{ width: `${data.completion_pct ?? 0}%` }} /></div>
         </div>
       </div>
 

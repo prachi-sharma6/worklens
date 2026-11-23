@@ -88,11 +88,11 @@ function AppearanceSection() {
       <div className="grid grid-cols-2 gap-3 max-w-md">
         {(['light', 'dark'] as const).map((t) => (
           <button key={t} onClick={() => set(t)} className={cx('rounded-lg border p-3 text-left transition', theme === t ? 'border-accent ring-2 ring-accent/20' : 'border-border hover:bg-subtle')}>
-            <div className={cx('h-14 rounded-md border mb-2 flex items-end p-1.5 gap-1', t === 'dark' ? 'bg-[#0B1020] border-[#262f42]' : 'bg-[#FAFAFB] border-[#e5e7eb]')}>
-              <span className={cx('h-full w-1/4 rounded', t === 'dark' ? 'bg-[#111827]' : 'bg-white border border-[#e5e7eb]')} />
-              <span className="h-2 w-8 rounded bg-[#6366F1]" />
+            <div className={cx('h-14 rounded-md border mb-2 flex items-end p-1.5 gap-1', t === 'dark' ? 'bg-[#0E1117] border-[#232B3A]' : 'bg-[#EEF1F6] border-[#DADFE8]')}>
+              <span className={cx('h-full w-1/4 rounded', t === 'dark' ? 'bg-[#161B26]' : 'bg-[#F9FAFC] border border-[#DADFE8]')} />
+              <span className={cx('h-2 w-8 rounded', t === 'dark' ? 'bg-[#5EEAD4]' : 'bg-[#0F766E]')} />
             </div>
-            <p className="text-xs font-medium flex items-center gap-1.5">{t === 'dark' ? <Moon size={12} /> : <Sun size={12} />}{t === 'dark' ? 'Dark' : 'Light'}</p>
+            <p className="text-xs font-medium flex items-center gap-1.5">{t === 'dark' ? <Moon size={12} /> : <Sun size={12} />}{t === 'dark' ? 'Midnight (default)' : 'Mist (light)'}</p>
           </button>
         ))}
       </div>

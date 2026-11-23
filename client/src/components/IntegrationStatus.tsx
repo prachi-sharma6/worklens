@@ -38,7 +38,7 @@ export function AppLogo({ app, size = 18 }: { app: 'ai' | 'slack' | 'gmail'; siz
   return <img src={APP_ICONS[app]} alt="" className="rounded bg-white object-contain shrink-0" style={{ width: size, height: size, padding: size > 20 ? 3 : 1 }} />;
 }
 export function StateDot({ state, className }: { state: AppState; className?: string }) {
-  return <span className={cx('inline-block h-2 w-2 rounded-full ring-2 ring-surface', DOT[state], className)} aria-hidden />;
+  return <span className={cx('inline-block h-2 w-2 rounded-full ring-2 ring-surface', DOT[state], state === 'connected' && 'live-dot', className)} aria-hidden />;
 }
 const NAMES = { ai: 'viaSocket AI', slack: 'Slack', gmail: 'Gmail' } as const;
 

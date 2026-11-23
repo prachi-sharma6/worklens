@@ -41,7 +41,7 @@ export function AppShell() {
   const sidebar = (
     <div className="flex h-full flex-col">
       <div className={cx('flex items-center h-14 px-4 gap-2 border-b border-border', narrow && 'justify-center px-0')}>
-        <div className="h-7 w-7 rounded-md bg-accent flex items-center justify-center shrink-0"><div className="h-3.5 w-3.5 rounded-full border-[2.5px] border-white" /></div>
+        <div className="h-7 w-7 rounded-lg bg-[#0E1117] ring-1 ring-border flex items-center justify-center shrink-0"><div className="h-3.5 w-3.5 rounded-full border-[2.5px] border-[#5EEAD4]" /></div>
         {!narrow && <div className="min-w-0"><p className="font-semibold leading-tight">WorkLens</p><p className="text-[10px] text-faint leading-tight truncate">Make every contribution visible</p></div>}
         {isMobile && <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setDrawer(false)} aria-label="Close menu"><X size={16} /></Button>}
       </div>

@@ -62,7 +62,7 @@ export function GettingStarted() {
       subtitle={steps ? `${done} of ${steps.length} done · steps tick themselves off as you go` : 'Loading…'}
       action={<div className="flex items-center gap-1"><Link to="/help" className="text-xs text-accent hover:underline px-1">Full guide</Link><Button size="icon" variant="ghost" aria-label="Hide the guide" title="Hide (bring it back from How to use)" onClick={() => { setGuideHidden(true); setHidden(true); }}><X size={14} /></Button></div>}
       bodyClass="px-2 pb-2">
-      {steps && <div className="mx-2 mb-2 h-1.5 rounded-full bg-subtle overflow-hidden"><div className="h-full bg-accent rounded-full transition-all" style={{ width: `${(done / steps.length) * 100}%` }} /></div>}
+      {steps && <div className="mx-2 mb-2 h-1.5 rounded-full bg-subtle overflow-hidden"><div className="h-full bg-accent rounded-full bar-grow" style={{ width: `${(done / steps.length) * 100}%` }} /></div>}
       <ol className="divide-y divide-border">
         {(steps ?? []).map((s, i) => (
           <li key={s.title} className="flex items-center gap-3 px-2 py-2.5">

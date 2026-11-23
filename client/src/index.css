@@ -2,46 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Midnight design direction. Light = "Mist" (tinted, never plain white); dark = Midnight (default). */
 :root {
-  --bg: 250 250 251;
-  --surface: 255 255 255;
-  --subtle: 244 245 247;
-  --border: 229 231 235;
+  --bg: 238 241 246;
+  --surface: 249 250 252;
+  --subtle: 231 235 242;
+  --border: 218 223 232;
   --fg: 17 24 39;
-  --muted: 75 85 99;
-  --faint: 140 147 160;
-  --accent: 99 102 241;
+  --muted: 71 85 105;
+  --faint: 100 110 128;
+  --accent: 15 118 110;
   --accent-fg: 255 255 255;
-  --accent-soft: 238 239 254;
-  --success: 22 163 74;
-  --success-soft: 232 247 237;
-  --warning: 217 119 6;
-  --warning-soft: 254 245 225;
-  --danger: 205 70 70;
-  --danger-soft: 252 236 236;
-  --info: 14 116 204;
-  --info-soft: 230 242 252;
+  --accent-soft: 220 242 238;
+  --ai: 109 40 217;
+  --success: 21 128 61;
+  --success-soft: 226 245 233;
+  --warning: 180 83 9;
+  --warning-soft: 253 243 222;
+  --danger: 185 28 28;
+  --danger-soft: 252 233 233;
+  --info: 29 78 216;
+  --info-soft: 226 234 252;
   color-scheme: light;
 }
 .dark {
-  --bg: 11 16 32;
-  --surface: 17 24 39;
-  --subtle: 24 32 50;
-  --border: 38 47 66;
-  --fg: 236 238 243;
-  --muted: 164 172 188;
-  --faint: 112 121 140;
-  --accent: 129 132 248;
-  --accent-fg: 255 255 255;
-  --accent-soft: 35 38 82;
-  --success: 74 196 120;
+  --bg: 14 17 23;
+  --surface: 22 27 38;
+  --subtle: 28 36 51;
+  --border: 35 43 58;
+  --fg: 230 234 242;
+  --muted: 154 164 184;
+  --faint: 124 134 154;
+  --accent: 94 234 212;
+  --accent-fg: 14 17 23;
+  --accent-soft: 21 48 47;
+  --ai: 167 139 250;
+  --success: 74 222 128;
   --success-soft: 18 48 34;
-  --warning: 240 170 60;
-  --warning-soft: 56 40 14;
-  --danger: 236 110 110;
+  --warning: 251 191 36;
+  --warning-soft: 56 44 14;
+  --danger: 248 113 113;
   --danger-soft: 60 24 28;
-  --info: 90 170 240;
-  --info-soft: 16 40 66;
+  --info: 96 165 250;
+  --info-soft: 20 36 66;
   color-scheme: dark;
 }
 
@@ -54,12 +57,12 @@
 }
 
 @layer components {
-  .card { @apply bg-surface border border-border rounded-lg shadow-card; }
+  .card { @apply bg-surface border border-border rounded-2xl; animation: wl-rise .45s cubic-bezier(.2,.8,.2,1) both; }
   .tnum { font-variant-numeric: tabular-nums; }
-  .input { @apply w-full h-9 px-3 rounded-md bg-surface border border-border text-fg placeholder:text-faint outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20; }
+  .input { @apply w-full h-9 px-3 rounded-lg bg-surface border border-border text-fg placeholder:text-faint outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20; }
   textarea.input { @apply h-auto py-2; }
   .label { @apply block text-xs font-medium text-muted mb-1.5; }
-  .h-page { @apply text-xl font-semibold tracking-tight; }
+  .h-page { @apply text-2xl font-semibold tracking-tight; font-family: "Space Grotesk", Inter, ui-sans-serif, sans-serif; }
   .section-title { @apply text-sm font-semibold; }
 }
 
@@ -69,3 +72,16 @@
 @keyframes sk { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .recharts-cartesian-axis-tick-value { fill: rgb(var(--faint)); font-size: 11px; }
 .recharts-cartesian-grid line { stroke: rgb(var(--border)); }
+
+/* Motion — subtle, and off for anyone who prefers reduced motion. */
+@keyframes wl-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes wl-pulse { 0% { box-shadow: 0 0 0 0 rgb(var(--success) / .55); } 70% { box-shadow: 0 0 0 7px rgb(var(--success) / 0); } 100% { box-shadow: 0 0 0 0 rgb(var(--success) / 0); } }
+@keyframes wl-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes wl-ring { from { stroke-dashoffset: var(--ring-c); } }
+.animate-rise { animation: wl-rise .45s cubic-bezier(.2,.8,.2,1) both; }
+.live-dot { animation: wl-pulse 2.2s ease-out infinite; }
+.bar-grow { transform-origin: left; animation: wl-grow .9s .15s cubic-bezier(.2,.8,.2,1) both; }
+.ring-anim { animation: wl-ring 1.2s .2s cubic-bezier(.2,.8,.2,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

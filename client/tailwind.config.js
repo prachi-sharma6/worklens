@@ -5,7 +5,7 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
-      fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'] },
+      fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'], display: ['"Space Grotesk"', 'Inter', 'ui-sans-serif', 'sans-serif'] },
       colors: {
         bg: v('bg'),
         surface: v('surface'),
@@ -19,6 +19,7 @@ export default {
         warning: { DEFAULT: v('warning'), soft: v('warning-soft') },
         danger: { DEFAULT: v('danger'), soft: v('danger-soft') },
         info: { DEFAULT: v('info'), soft: v('info-soft') },
+        ai: v('ai'),
       },
       borderRadius: { DEFAULT: '8px', lg: '10px', xl: '12px' },
       boxShadow: {
