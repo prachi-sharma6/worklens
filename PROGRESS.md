@@ -21,13 +21,13 @@
 - **Playwright** via `playwright-core` driving the locally installed Edge — no browser download.
 - Managers can open task details, reports (`?user=ID`) and profiles for their team; nav shows only pages 11–14 for managers.
 
-## Midnight visual direction (Nov 23 2026, local only — not deployed)
+## Midnight visual direction (Nov 23 2026 — deployed to Embarko, commit 8482f3a)
 - Chosen from the design canvas (page “Minimal & colour”, board B). Midnight is now the default theme (navy #0E1117, slate cards #161B26, mint accent #5EEAD4 with dark text); the light theme is “Mist” (tinted #EEF1F6 ground, deep-teal #0F766E accent — never plain white). Stored `wl-theme=light` still wins.
 - Space Grotesk for page titles and big numbers; pill buttons; 16px-radius cards; flat (no gradient) surfaces; chart palette re-tuned to read on both themes.
 - Motion: cards rise in, score/plan rings draw in, bars fill, connected-app dots pulse while live — all disabled under prefers-reduced-motion.
 - Employee dashboard “Focus now” card: most urgent in-progress task (else next planned), done-when outcome, Finish/I’m blocked, ring = today’s plan completion (real data).
 
-## UI visibility pass (Nov 23 2026, local only — not deployed)
+## UI visibility pass (Nov 23 2026 — deployed with the Midnight release)
 - Connected apps visible everywhere: top-bar pill (AI · Slack · Gmail with live dots → details popover), sidebar “Powered by viaSocket” badge, new **Integrations** page for both roles (viaSocket intro, status cards with account/channel/recipients and what each app does, the 7 automations with apps, on/off and last run; manager controls below; employee Slack-DM opt-in).
 - Navigation: grouped sidebar (My work / Insights / Reports / Connected apps) with hints on every item; managers gained Reports, Integrations and “How to use”; Ctrl K searches hints too.
 - Dashboards: role-aware “How to use WorkLens” checklist ticked from real data (hideable, restorable from Help) + “Powered by viaSocket” card.
