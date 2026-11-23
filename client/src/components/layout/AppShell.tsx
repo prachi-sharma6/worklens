@@ -12,6 +12,7 @@ import { ConnectedAppsPill, IntegrationsProvider, PoweredByViasocket } from '@/c
 import { markVisited } from '@/components/Onboarding';
 import { useAuth, useTheme, useUI } from '@/context';
 import { useMediaQuery } from '@/lib/hooks';
+import { Info } from 'lucide-react';
 
 export function AppShell() {
   const { user, logout } = useAuth();
@@ -42,7 +43,7 @@ export function AppShell() {
     <div className="flex h-full flex-col">
       <div className={cx('flex items-center h-14 px-4 gap-2 border-b border-border', narrow && 'justify-center px-0')}>
         <div className="h-7 w-7 rounded-lg bg-[#0E1117] ring-1 ring-border flex items-center justify-center shrink-0"><div className="h-3.5 w-3.5 rounded-full border-[2.5px] border-[#5EEAD4]" /></div>
-        {!narrow && <div className="min-w-0"><p className="font-semibold leading-tight">WorkLens</p><p className="text-[10px] text-faint leading-tight truncate">Make every contribution visible</p></div>}
+        {!narrow && <div className="min-w-0"><p className="font-semibold leading-tight">WorkLens</p><p className="text-[10px] text-faint leading-tight truncate">Powered by <span className="text-accent font-semibold">viaSocket</span></p></div>}
         {isMobile && <Button variant="ghost" size="icon" className="ml-auto" onClick={() => setDrawer(false)} aria-label="Close menu"><X size={16} /></Button>}
       </div>
       {user.role === 'employee' && (
@@ -107,7 +108,16 @@ export function AppShell() {
           </div>
         </header>
         <main ref={mainRef} className="flex-1 overflow-y-auto scrollbar-thin">
-          <div className="mx-auto max-w-[1280px] px-4 py-5 lg:px-6 lg:py-6"><Outlet /></div>
+          <div className="mx-auto max-w-[1280px] px-4 py-5 lg:px-6 lg:py-6">
+            <PageGuide path={loc.pathname} role={user.role} />
+            <Outlet />
+          </div>
+          <footer className="mx-auto max-w-[1280px] px-4 lg:px-6 pb-6">
+            <div className="border-t border-border pt-4 flex flex-col sm:flex-row gap-2 sm:items-center justify-between text-[11px] text-faint">
+              <span>WorkLens · <span className="text-muted">AI, Slack and Gmail</span> powered by <a href="https://viasocket.com" target="_blank" rel="noreferrer" className="text-accent font-semibold hover:underline">viaSocket</a> · built for the viaSocket challenge</span>
+              <span className="flex gap-3"><NavLink to="/help" className="hover:text-fg">How to use</NavLink><NavLink to="/integrations" className="hover:text-fg">Connected apps</NavLink></span>
+            </div>
+          </footer>
         </main>
       </div>
 
@@ -132,5 +142,24 @@ function SideLink({ it, narrow }: { it: NavItem; narrow: boolean }) {
         isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-subtle hover:text-fg')}>
       <Icon size={16} className="shrink-0" />{!narrow && it.label}
     </NavLink>
+  );
+}
+
+/** One line under the top bar on every page: what this page is for, plus a link to the guide. */
+const EXTRA_PAGES: { test: RegExp; label: string; hint: string }[] = [
+  { test: /^\/tasks\/new$/, label: 'Create task', hint: 'Write the outcome you’re aiming for; viaSocket AI can suggest how to measure it' },
+  { test: /^\/tasks\/\d+/, label: 'Task details', hint: 'Everything about one task: status, evidence, blockers, comments, review and its history' },
+  { test: /^\/people\/\d+/, label: 'Profile', hint: 'One person’s work timeline, scores (with explanations), tasks, evidence and reviews' },
+];
+function PageGuide({ path, role }: { path: string; role: 'employee' | 'manager' }) {
+  const all = [...(role === 'manager' ? MANAGER_GROUPS : EMPLOYEE_GROUPS).flatMap((g) => g.items), ...FOOTER_NAV];
+  const extra = EXTRA_PAGES.find((p) => p.test.test(path));
+  const item = extra ?? all.find((i) => path === i.to) ?? all.find((i) => path.startsWith(i.to + '/'));
+  if (!item) return null;
+  return (
+    <p className="mb-4 flex items-start gap-1.5 text-xs text-faint">
+      <Info size={13} className="mt-px shrink-0 text-accent" />
+      <span><span className="text-muted font-medium">{item.label}:</span> {item.hint}. {path !== '/help' && <NavLink to="/help" className="text-accent hover:underline">How to use →</NavLink>}</span>
+    </p>
   );
 }
