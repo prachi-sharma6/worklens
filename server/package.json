@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch-path=src --watch-path=../shared src/index.js",
+    "start": "node src/index.js",
+    "seed": "node src/db/seed.js",
+    "test": "node --test --test-concurrency=1 test/"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^4.6.0",
+    "viasocket-apps": "^0.21.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

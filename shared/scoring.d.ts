@@ -1,0 +1,10 @@
+import type { Dimension, ScoreResult } from '../client/src/api/types';
+export const PRIORITY_WEIGHT: Record<string, number>;
+export const IMPACT_POINTS: Record<string, number>;
+export const DIMENSIONS: Dimension[];
+export const MIN_POINTS: number;
+export const FORMULAS: Record<Dimension, string>;
+export function isoWeekStart(d: Date | string | number): Date;
+export function computeScores(data: unknown, userId: number, periodStart: Date | string, opts?: { now?: Date; days?: number }): ScoreResult;
+export function computeTrend(data: unknown, userId: number, weeks?: number, now?: Date): ScoreResult[];
+export function computeRolling(data: unknown, userId: number, now?: Date): ScoreResult;

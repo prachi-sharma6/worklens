@@ -1,0 +1,26 @@
+{
+  "name": "worklens",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n server,client -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "typecheck": "npm run typecheck -w client",
+    "screenshots": "node scripts/screenshots.mjs",
+    "smoke": "node scripts/flow-smoke.mjs",
+    "seed": "npm run seed -w server",
+    "test": "npm test -w server",
+    "start": "npm run build && npm start -w server",
+    "smoke:isolated": "node scripts/smoke-isolated.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "playwright-core": "^1.49.0",
+    "rollup": "npm:@rollup/wasm-node@^4.68.8"
+  }
+}
