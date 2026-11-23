@@ -8,6 +8,7 @@
 | 4 — Scoring engine tests, analytics, reports | ✅ Done |
 | 5 — viaSocket (AI + Slack + Gmail + schedules) | ✅ Done — 2 items UNTESTED (see viasocket-plan.md) |
 | 6 — Tests, polish, README | ✅ Done |
+| Deploy — Embarko | ✅ Live at https://worklens.embarko.app (locked) |
 
 ## Decisions
 - **Client in TypeScript**, server will be plain Node ESM. Tailwind v3 with CSS-variable tokens for light/dark.
@@ -19,6 +20,13 @@
 - **Windows Smart App Control blocks unsigned native `.node` addons** in this folder (rollup's native binary failed with "An Application Control policy has blocked this file"). Fix: root devDependency `rollup` aliased to `@rollup/wasm-node`; esbuild's signed exe runs fine. **Phase 2 impact:** `better-sqlite3` and `bcrypt` are native addons and will likely be blocked too → plan is to use Node's built-in `node:sqlite` (Node 26 here) and `bcryptjs`. Same SQL, no native code.
 - **Playwright** via `playwright-core` driving the locally installed Edge — no browser download.
 - Managers can open task details, reports (`?user=ID`) and profiles for their team; nav shows only pages 11–14 for managers.
+
+## Deploy (Embarko, Nov 23 2026)
+- Live: https://worklens.embarko.app · app id `cmwstqibz0096m1ti403l72sw` · claimed with the Embarko key (saved in `~/.embarko/credentials`) · **locked** to the Embarko workspace (your choice; viaSocket AI/Slack/Gmail stay on behind it).
+- Changes for Embarko’s rules: `server/src/config.js` (PORT/0.0.0.0, `DATA_DIR` for DB + uploads, generated JWT secret in DATA_DIR, secure cookies, APP_URL from APP_NAME); node-cron + the 3 s worker removed → events run right after the request that queued them, and `GET /api/cron/tick` (CRON_SECRET) runs due reports/interventions/outbox, called every 5 min by the `embarko.json` schedule (locally: a 1-min interval). Due jobs fire within a 2 h window, de-duplicated. Root `npm start` no longer builds (Embarko runs `npm run build` itself); `engines.node >= 22.13`.
+- Verified: build succeeded and went live; `VIASOCKET_*` set as env vars and applied (live again); schedule test run → `ok 200 tick ok`; unsigned requests → 302 to the Embarko lock page. Local Embarko simulation: seeds into empty DATA_DIR, Secure cookie, tick 401 without secret. 88/88 tests.
+- **Not verified by me:** signing in and using the app (needs your Embarko sign-in), and Connect Slack/Gmail from the deployed origin (if viaSocket’s embed has a domain whitelist, worklens.embarko.app must be on it).
+- Notes: deployed DB is separate (fresh demo data, no Slack/Gmail connected yet); no backups on Embarko; AI features are on, so new tasks and the 18:30 weekday report use AI credits.
 
 ## Phase 6 — what changed
 - **Bug fixed:** “Reset demo data” failed (FOREIGN KEY) once viaSocket connections existed; the reset now defers FK checks to commit and keeps connections.
@@ -38,7 +46,7 @@
 ## Phase 5 — what changed
 - Skill `viasocket-integrations` installed at `.claude/skills/viasocket-integrations/SKILL.md` (pointer; the skill is re-fetched each time). Plan + test record: `viasocket-plan.md`.
 - `server/src/integrations/viasocket.js` is the only importer of `viasocket-apps` (0.21.0). Each manager connects Slack/Gmail via viaSocket's Connect popup (Settings → Integrations); the server verifies the auth_id is theirs, then builds one webhook-triggered flow per app ("WorkLens → Slack/Gmail", one step calling `Send_Message v110` / `Send_Email v56`). auth_id + script_id live only in `integration_connections`.
-- `integrations/outbox.js`: worker every 3 s claims each queued event once (attempts=1) and runs its workflow; writes are never retried automatically (Retry button creates a new event). Events queued before integrations were enabled are skipped. node-cron (every minute): daily report at workday end on weekdays, weekly Friday 17:00, intervention scan every 15 min (only when Slack is connected), each de-duplicated in `notification_log`.
+- `integrations/outbox.js`: claims each queued event once (attempts=1) and runs its workflow; writes are never retried automatically (Retry button creates a new event). Events queued before integrations were enabled are skipped. (Since the Embarko deploy: runs right after the queuing request + on the `/api/cron/tick` schedule; node-cron removed.) Daily report at workday end on weekdays, weekly Friday 17:00, interventions (only when Slack is connected), each de-duplicated in `notification_log`.
 - `integrations/workflows.js`: the six workflows. `integrations/ai.js`: guardrail prompt (records only, no web, no invented facts, no scores, no pronouns), json_schema answers re-validated with zod, template fallback on any failure.
 - UI: Settings → Integrations (Connect/Reconnect/Disconnect, channel picker, teammate Slack map, recipients, feature toggles with credit notes, run-now with date, outbox + Retry); AI suggestions card on tasks (apply selected / dismiss); AI reading on blockers; AI cards on Insights + dashboard with "AI-generated from N records · See the records".
 - Migration `002_viasocket.sql`: `integration_connections`, `notification_log`, blocker Slack thread refs + AI reading, outbox result columns.

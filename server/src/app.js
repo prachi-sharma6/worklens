@@ -11,6 +11,7 @@ import { peopleRoutes } from './routes/people.js';
 import { integrationRoutes } from './routes/integrations.js';
 import { onChanged } from './lib/events.js';
 import { createRecomputeScheduler } from './scoring/index.js';
+import { runTick } from './integrations/outbox.js';
 
 export function createApp(db, { recomputeDelayMs = 1500 } = {}) {
   const app = express();
@@ -31,6 +32,16 @@ export function createApp(db, { recomputeDelayMs = 1500 } = {}) {
   app.use('/api', (_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); next(); });
 
   app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
+  // Embarko schedule (embarko.json): GET /api/cron/tick every 5 minutes with "Authorization: Bearer $CRON_SECRET".
+  app.get('/api/cron/tick', async (req, res) => {
+    if (!process.env.CRON_SECRET || req.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) return res.sendStatus(401);
+    try {
+      const fired = await runTick(db);
+      const q = db.get("SELECT COUNT(*) AS n FROM integration_events WHERE status = 'queued'").n;
+      res.type('text').send(`tick ok · queued now: ${fired.join(', ') || 'nothing due'} · still queued: ${q}`);
+    } catch (e) { console.error('[tick]', e); res.status(500).type('text').send('tick failed'); }
+  });
   app.use('/api', authRoutes(db));
   app.use('/api', requireAuth(db));
   app.use('/api', accountRoutes(db));

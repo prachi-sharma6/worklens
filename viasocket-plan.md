@@ -49,7 +49,7 @@ The flow's `script_id` is stored on the server only (a credential), used only fo
 reconnected in place when `isExpired`.
 
 **Where it runs:** all calls from the WorkLens server. The browser only receives the per-user embed token for the
-Connect popup. Scheduling (daily/weekly/interventions) stays on the server with `node-cron`, because viaSocket's cloud
+Connect popup. Scheduling (daily/weekly/interventions) stays on the server (now: the `/api/cron/tick` route, called by Embarko's schedule when hosted), because viaSocket's cloud
 cannot call back into `localhost`; outbound calls work fine.
 
 **Credits:** AI and action runs use credits. Build-time testing is **one real run each**: Slack post, Slack thread

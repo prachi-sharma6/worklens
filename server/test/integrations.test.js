@@ -87,9 +87,16 @@ describe('schedules (node-cron tick)', () => {
     assert.equal(db.get("SELECT COUNT(*) AS n FROM integration_events WHERE event_type = 'report.daily'").n, before + 1);
     assert.ok(!scheduleTick(db, new Date('2026-11-21T13:00:00Z')).includes('daily'), 'not on Saturday');
   });
-  test('weekly analysis fires Friday 17:00 team time', () => {
-    assert.ok(scheduleTick(db, new Date('2026-11-20T11:30:00Z')).includes('weekly'));
+  test('weekly analysis fires once on Friday from 17:00 team time, never on other days', () => {
+    const weekly = () => db.get("SELECT COUNT(*) AS n FROM integration_events WHERE event_type = 'report.weekly' AND payload_json LIKE '%2026-11-16%'").n;
+    scheduleTick(db, new Date('2026-11-20T11:30:00Z')); // Fri 17:00 IST
+    scheduleTick(db, new Date('2026-11-20T12:30:00Z')); // Fri 18:00 IST (later tick, same week)
+    assert.equal(weekly(), 1);
     assert.ok(!scheduleTick(db, new Date('2026-11-19T11:30:00Z')).includes('weekly'), 'not Thursday');
+  });
+  test('a late tick inside the 2-hour window still runs the daily report; after it, never', () => {
+    assert.ok(scheduleTick(db, new Date('2026-11-18T14:40:00Z')).includes('daily'), 'Wed 20:10 IST, 1h40 late'); // within window
+    assert.ok(!scheduleTick(db, new Date('2026-11-17T15:30:00Z')).includes('daily'), 'Tue 21:00 IST, too late');
   });
   test('interventions are not marked as alerted while Slack is not connected', () => {
     const fired = scheduleTick(db, new Date('2026-11-20T10:15:00Z'));

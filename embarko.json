@@ -1,0 +1,13 @@
+{
+  "$schema": "https://embarko.ai/schema/embarko.json",
+  "appId": "cmwstqibz0096m1ti403l72sw",
+  "lock": true,
+  "schedules": [
+    {
+      "cron": "*/5 * * * *",
+      "path": "/api/cron/tick",
+      "timezone": "Asia/Kolkata",
+      "name": "WorkLens automations (reports, interventions, outbox)"
+    }
+  ]
+}

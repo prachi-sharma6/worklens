@@ -3,7 +3,7 @@ import multer from 'multer';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { fileURLToPath } from 'node:url';
+import { UPLOAD_DIR } from '../config.js';
 import { z } from 'zod';
 import { h, parse, badRequest, notFound } from '../lib/http.js';
 import { logEvent, enqueue, nowIso, markChanged } from '../lib/events.js';
@@ -12,7 +12,7 @@ import { assertCanSeeUser, getTaskFor, visibleUserIds, isManager, visibleUsers }
 import { snapshot, taskRow, blockerRow } from '../services/data.js';
 import { filterTasks, meta, reviewQueue, dk } from '../services/views.js';
 
-export const UPLOAD_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../uploads');
+export { UPLOAD_DIR };
 const ALLOWED = { 'image/png': '.png', 'image/jpeg': '.jpg', 'image/webp': '.webp', 'image/gif': '.gif', 'application/pdf': '.pdf' };
 const upload = multer({
   storage: multer.diskStorage({

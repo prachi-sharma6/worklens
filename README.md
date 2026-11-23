@@ -29,7 +29,9 @@ Open http://localhost:5173 and pick a demo account on the login page (all passwo
 | Employee | `priya@worklens.dev`, `rohan@worklens.dev`, `zoya@worklens.dev` | Design, Support, Marketing |
 | Employee | `kabir@worklens.dev` | Joined this week — shows the **Provisional** score state |
 
-`npm start` builds the client and serves app + API together on http://localhost:4000.
+`npm run build && npm start` serves the built app + API together on http://localhost:4000.
+
+**Live:** https://worklens.embarko.app (private to the Embarko workspace — see *Deploying to Embarko*).
 
 ### Scripts
 
@@ -139,8 +141,10 @@ Every automation is written to the **outbox** first (Settings → Integrations, 
 and marked `sent`, `skipped_not_connected` (with the reason) or `failed`. Failed sends are **never retried
 automatically** — press **Retry**.
 
-**Why node-cron and not viaSocket’s scheduler:** WorkLens runs on `localhost`, which viaSocket’s cloud can’t call back
-into; outbound calls work fine. On a public URL the schedules could move to viaSocket triggers.
+**Scheduling:** the timed work lives in one route, `GET /api/cron/tick` (protected by `CRON_SECRET`): due daily/weekly
+reports (they still run if a tick comes up to 2 h late; never replayed after that), intervention checks, and anything
+left in the outbox. On Embarko it is called every 5 minutes by the schedule in `embarko.json`; locally a plain
+one-minute interval calls the same code. Outbox events otherwise run right after the request that queued them.
 
 ### AI guardrails
 
@@ -167,6 +171,28 @@ JSON schema and re-validated with zod; on any error or invalid answer the plain 
 `npx -y viasocket-apps check server` → 0 FAIL, 0 WARN. Details and the plan table: `viasocket-plan.md`.
 
 ---
+
+## Deploying to Embarko
+
+Live at **https://worklens.embarko.app** — app id `cmwstqibz0096m1ti403l72sw` (kept in `embarko.json`), claimed, and
+**locked**: visitors sign in with an Embarko account from the workspace first, then use WorkLens’ own login. A password
+for people outside the workspace can be set on the app’s Members/lock page in the Embarko dashboard.
+
+How it runs there (all set in code, nothing to configure):
+
+- One process: Embarko runs `npm install`, `npm run build` (the client), then `npm start` (the API, which also serves the built client). It listens on `PORT` and `0.0.0.0`.
+- Data: SQLite at `$DATA_DIR/worklens.db`, evidence uploads in `$DATA_DIR/uploads`, the session-signing secret generated once into `$DATA_DIR/jwt_secret`. An empty `DATA_DIR` seeds fresh demo data on first start. **Embarko does not back up data.**
+- Schedule: `embarko.json` → `GET /api/cron/tick` every 5 minutes (Asia/Kolkata). Embarko emails the owner if it starts failing.
+- Secrets: the three `VIASOCKET_*` keys are Embarko environment variables (set once; values can’t be read back). Nothing secret is in the upload.
+
+Redeploy (Embarko key in `~/.embarko/credentials`):
+
+```bash
+tar -czf /tmp/worklens.tar.gz --exclude=node_modules --exclude=.git --exclude='.env*' --exclude=dist --exclude='*.db' --exclude='*.db-*' --exclude=screenshots --exclude=docs-cache --exclude=.claude --exclude='server/uploads/*' --exclude='server/data' .
+curl -sS -X POST https://ship.embarko.ai/apps --oauth2-bearer "$(cat ~/.embarko/credentials)" -H 'X-App-Name: worklens' -H 'X-Agent-Name: claude-code' -F 'source=@/tmp/worklens.tar.gz'
+```
+
+The deployed app has its **own** database: its Slack/Gmail connections are made again from its Settings → Integrations.
 
 ## How it’s built
 

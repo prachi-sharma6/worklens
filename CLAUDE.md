@@ -12,7 +12,8 @@ Internal work-measurement app (viaSocket challenge). Build spec is phased; statu
 - `npm run screenshots` — with dev server running: visits every route as employee + manager in both themes, writes `screenshots/*.png` and `screenshots/console-errors.txt` (uses playwright-core + local Edge/Chrome, no browser download)
 - `npm run smoke:isolated` — the click-through on a copy of the DB (port 4100, viaSocket off). Prefer this: `npm run smoke` resets the LIVE demo data
 - `node scripts/responsive.mjs` — every page × roles × 375/768/1280 × themes: console errors, failed API calls, horizontal overflow
-- `npm start` — build client and serve app + API on :4000. Env: `DB_PATH` (other DB file), `VIASOCKET_DISABLED=1` (never call viaSocket)
+- `npm run build && npm start` — serve built app + API on :4000. Env: `DB_PATH`, `DATA_DIR`, `VIASOCKET_DISABLED=1` (never call viaSocket), `APP_NAME` (= hosted mode: binds 0.0.0.0, secure cookies, no in-process timers)
+- Deployed on Embarko: https://worklens.embarko.app (locked). Redeploy + how it runs: README “Deploying to Embarko”. Embarko key: `~/.embarko/credentials` (never print or commit it)
 - Demo logins: `manager@worklens.dev`, `aarav@worklens.dev` (also priya/rohan/zoya/kabir) — password `demo1234`
 
 ## Folder map
@@ -28,6 +29,7 @@ Internal work-measurement app (viaSocket challenge). Build spec is phased; statu
 - `client/src/pages/` — one file per page (14 pages; Daily/Weekly reports share `Reports.tsx`)
 
 ## Gotchas
+- Embarko forbids in-process timers/background workers: periodic work goes through `GET /api/cron/tick` (embarko.json schedule); paths/ports/cookies come from `server/src/config.js`. Persistent files only under `DATA_DIR`.
 - viaSocket `listConnections()` returns the auth_id in `id` (docs say `identifier`; reported as `row1kk3cbws4`).
 - Windows Smart App Control blocks native `.node` addons here: rollup is aliased to `@rollup/wasm-node`; use `node:sqlite` + `bcryptjs` on the server, not `better-sqlite3`/`bcrypt`.
 

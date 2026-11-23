@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const UPLOAD_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../uploads');
 import { generateSeed } from '../../../shared/seed.js';
 import { openDb } from './index.js';
+import { UPLOAD_DIR, DB_FILE } from '../config.js';
 
 const TABLES = ['notification_log', 'integration_events', 'activity_timeline', 'weekly_reports', 'daily_reports', 'performance_records', 'score_overrides',
   'manager_reviews', 'blockers', 'task_comments', 'task_evidence', 'tasks', 'settings', 'users', 'teams'];
@@ -38,7 +38,7 @@ export function seedDatabase(db, now = new Date(), opts = {}) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const db = openDb();
+  const db = openDb(DB_FILE);
   const counts = seedDatabase(db, new Date(), { clearUploads: true });
   const { recomputeAll } = await import('../scoring/index.js');
   console.log('Seeded WorkLens demo data:', counts, `· weekly scores stored for ${recomputeAll(db)} employees`);

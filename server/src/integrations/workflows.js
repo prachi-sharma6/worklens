@@ -1,13 +1,14 @@
 // The six WorkLens workflows (spec §5.4), run by the outbox worker. Each handler returns
 // { status: 'sent' | 'skipped_not_connected', result } or throws (→ 'failed', never retried automatically).
 import * as vs from './viasocket.js';
+import { APP_URL as APP_URL_CONFIG } from '../config.js';
 import * as ai from './ai.js';
 import { getSettings, getPrefs, snapshot, taskRow, blockerRow } from '../services/data.js';
 import { dailyReport, weeklyReport, insights, dk } from '../services/views.js';
 import { saveReport } from '../services/reports.js';
 import { isoWeekStart } from '../scoring/index.js';
 
-const APP_URL = () => (process.env.APP_URL ?? 'http://localhost:5173').replace(/\/$/, '');
+const APP_URL = () => APP_URL_CONFIG;
 const link = (path, text) => `[${text}](${APP_URL()}${path})`;
 const hoursSince = (iso) => Math.round((Date.now() - new Date(iso).getTime()) / 3600000);
 const fmtDur = (h) => (h < 48 ? `${h}h` : `${Math.round(h / 24)}d`);

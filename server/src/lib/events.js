@@ -1,5 +1,5 @@
 // Every state change writes an activity_timeline row; automation-relevant ones also enqueue an outbox row.
-// Nothing consumes the outbox until Phase 5 — rows stay 'queued'.
+// The outbox worker (integrations/outbox.js) runs each queued row once.
 export const nowIso = () => new Date().toISOString();
 
 export function logEvent(db, { user_id, task_id = null, event_type, title, detail = null, at = nowIso() }) {
@@ -16,5 +16,7 @@ export function onChanged(db, fn) {
 }
 
 export function enqueue(db, event_type, payload) {
-  return db.insert('integration_events', { event_type, payload_json: JSON.stringify(payload), status: 'queued', attempts: 0 });
+  const id = db.insert('integration_events', { event_type, payload_json: JSON.stringify(payload), status: 'queued', attempts: 0 });
+  db.onEnqueue?.(); // the outbox runs it right after this request (set by startIntegrations; absent in tests)
+  return id;
 }

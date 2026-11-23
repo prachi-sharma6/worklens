@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { HttpError, forbidden } from './lib/http.js';
+import { SECURE_COOKIES } from './config.js';
 
 export const COOKIE = 'wl_token';
 const secret = () => {
@@ -10,7 +11,7 @@ const secret = () => {
 
 export function issueSession(res, user) {
   const token = jwt.sign({ sub: user.id, role: user.role }, secret(), { expiresIn: '7d' });
-  res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 7 * 86400000, path: '/' });
+  res.cookie(COOKIE, token, { httpOnly: true, sameSite: 'lax', secure: SECURE_COOKIES, maxAge: 7 * 86400000, path: '/' });
 }
 export const clearSession = (res) => res.clearCookie(COOKIE, { path: '/' });
 
