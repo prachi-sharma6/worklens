@@ -1,36 +1,52 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Bell, Database, Moon, Palette, PlugZap, RotateCcw, Scale, Sun, User as UserIcon, Users, Clock } from 'lucide-react';
 import { api, type Dimension, type NotificationPrefs, type Settings } from '@/api';
 import { Avatar, Badge, Button, Card, EmptyState, Field, Modal, Skeleton, Toggle, cx } from '@/components/ui';
 import { errMsg, useAuth, useTheme, useToast } from '@/context';
 import { DIM_LABEL, DIMS, fmtDateTime } from '@/lib/format';
 import { useAsync } from '@/lib/hooks';
-import { IntegrationsPanel } from '@/components/Integrations';
 
 const TIMEZONES = ['Asia/Kolkata', 'UTC', 'Europe/London', 'Europe/Berlin', 'America/New_York', 'America/Los_Angeles', 'Asia/Singapore', 'Australia/Sydney'];
+
+type Tab = 'profile' | 'notifications' | 'scoring' | 'team' | 'integrations' | 'demo';
+const TABS: { key: Tab; label: string; icon: React.ElementType; manager?: boolean; employee?: boolean }[] = [
+  { key: 'profile', label: 'Profile & look', icon: UserIcon },
+  { key: 'notifications', label: 'Notifications', icon: Bell, employee: true },
+  { key: 'scoring', label: 'Scoring & schedule', icon: Scale, manager: true },
+  { key: 'team', label: 'Team', icon: Users, manager: true },
+  { key: 'integrations', label: 'Integrations', icon: PlugZap, manager: true },
+  { key: 'demo', label: 'Demo data', icon: Database, manager: true },
+];
 
 export default function SettingsPage() {
   const { user } = useAuth();
   const isManager = user?.role === 'manager';
+  const [params, setParams] = useSearchParams();
+  const tabs = TABS.filter((t) => (t.manager ? isManager : t.employee ? !isManager : true));
+  const tab = (tabs.find((t) => t.key === params.get('tab'))?.key ?? 'profile') as Tab;
   return (
-    <div className="space-y-5 max-w-4xl">
+    <div className="space-y-4 max-w-4xl">
       <div>
         <h1 className="h-page">Settings</h1>
-        <p className="text-xs text-muted mt-0.5">{isManager ? 'Your profile, plus team-wide scoring, schedule and integrations.' : 'Your profile, appearance and notifications.'}</p>
+        <p className="text-xs text-muted mt-0.5">{isManager ? 'Your profile, team-wide scoring and schedule, team members and demo data.' : 'Your profile, appearance and notifications.'}</p>
       </div>
-      <ProfileSection />
-      <AppearanceSection />
-      {!isManager && <NotificationsSection />}
-      {isManager && (
-        <>
-          <WeightsSection />
-          <ScheduleSection />
-          <TeamSection />
-          <IntegrationsSection />
-          <DemoSection />
-        </>
-      )}
+      <div className="overflow-x-auto scrollbar-thin -mx-1 px-1">
+        <div role="tablist" aria-label="Settings sections" className="inline-flex gap-1 p-1 rounded-lg bg-subtle border border-border">
+          {tabs.map(({ key, label, icon: Icon }) => (
+            <button key={key} role="tab" aria-selected={tab === key} onClick={() => setParams(key === 'profile' ? {} : { tab: key }, { replace: true })}
+              className={cx('inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium whitespace-nowrap transition', tab === key ? 'bg-surface text-fg shadow-sm' : 'text-muted hover:text-fg')}>
+              <Icon size={14} />{label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {tab === 'profile' && <><ProfileSection /><AppearanceSection /></>}
+      {tab === 'notifications' && <NotificationsSection />}
+      {tab === 'scoring' && <><WeightsSection /><ScheduleSection /></>}
+      {tab === 'team' && <TeamSection />}
+      {tab === 'integrations' && <IntegrationsSection />}
+      {tab === 'demo' && <DemoSection />}
     </div>
   );
 }
@@ -196,7 +212,12 @@ function TeamSection() {
 }
 
 function IntegrationsSection() {
-  return <IntegrationsPanel />;
+  return (
+    <Card title={<SectionTitle icon={<PlugZap size={15} />}>Integrations have their own page</SectionTitle>}>
+      <p className="text-sm text-muted">Connect Slack and Gmail, choose the alert channel and recipients, switch automations on or off, and see every run — all in one place.</p>
+      <Link to="/integrations" className="inline-block mt-3"><Button variant="primary" icon={<PlugZap size={14} />}>Open Integrations</Button></Link>
+    </Card>
+  );
 }
 
 function DemoSection() {

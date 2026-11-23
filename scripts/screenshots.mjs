@@ -32,8 +32,8 @@ async function shot(page, path, name, full = true) {
   if (name) await page.screenshot({ path: `${OUT}/${name}.png`, fullPage: full });
 }
 
-const EMP = ['/dashboard', '/tasks', '/tasks/new', '/tasks/5', '/evidence', '/performance', '/insights', '/reports/daily', '/reports/weekly', '/people/2', '/settings'];
-const MGR = ['/manager', '/team', '/people/2', '/people/6', '/tasks/5', '/reports/daily', '/reports/weekly', '/settings'];
+const EMP = ['/dashboard', '/tasks', '/tasks/new', '/tasks/5', '/evidence', '/performance', '/insights', '/reports/daily', '/reports/weekly', '/people/2', '/settings', '/integrations', '/help'];
+const MGR = ['/manager', '/team', '/people/2', '/people/6', '/tasks/5', '/reports/daily', '/reports/weekly', '/settings', '/integrations', '/help'];
 
 for (const theme of ['light', 'dark']) {
   let { ctx, page } = await session({ email: 'aarav@worklens.dev', theme });

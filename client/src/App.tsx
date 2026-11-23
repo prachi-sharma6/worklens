@@ -16,6 +16,8 @@ import ManagerDashboard from './pages/ManagerDashboard';
 import TeamPerformance from './pages/TeamPerformance';
 import EmployeeProfile from './pages/EmployeeProfile';
 import SettingsPage from './pages/Settings';
+import IntegrationsPage from './pages/Integrations';
+import HelpPage from './pages/Help';
 import NotFound from './pages/NotFound';
 
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -54,6 +56,8 @@ export default function App() {
         <Route path="team" element={<Only role="manager"><TeamPerformance /></Only>} />
         <Route path="people/:id" element={<EmployeeProfile />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="integrations" element={<IntegrationsPage />} />
+        <Route path="help" element={<HelpPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

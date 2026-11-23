@@ -10,8 +10,8 @@ const channel = fs.existsSync('C:/Program Files (x86)/Microsoft/Edge/Application
 const browser = await chromium.launch({ channel });
 
 const ROLES = {
-  'aarav@worklens.dev': ['/dashboard', '/tasks', '/tasks/new', '/tasks/5', '/evidence', '/performance', '/insights', '/reports/daily', '/reports/weekly', '/people/2', '/settings'],
-  'manager@worklens.dev': ['/manager', '/team', '/people/2', '/people/6', '/tasks/5', '/reports/daily', '/reports/weekly', '/settings'],
+  'aarav@worklens.dev': ['/dashboard', '/tasks', '/tasks/new', '/tasks/5', '/evidence', '/performance', '/insights', '/reports/daily', '/reports/weekly', '/people/2', '/settings', '/integrations', '/help'],
+  'manager@worklens.dev': ['/manager', '/team', '/people/2', '/people/6', '/tasks/5', '/reports/daily', '/reports/weekly', '/settings', '/settings?tab=scoring', '/integrations', '/help'],
 };
 const WIDTHS = [375, 768, 1280];
 const problems = [];
@@ -45,7 +45,7 @@ for (const [email, pages] of Object.entries(ROLES)) {
           return { pageWide: document.documentElement.scrollWidth > vw + 1, sample: over.slice(0, 2).map((e) => `${e.tagName.toLowerCase()}.${String(e.className).split(' ').slice(0, 3).join('.')}`) };
         });
         if (o.pageWide) problems.push(`[${tag()}] horizontal overflow: ${o.sample.join(', ') || 'page wider than viewport'}`);
-        if (theme === 'dark' && (p === '/dashboard' || p === '/manager' || p === '/settings')) await page.screenshot({ path: `${OUT}/${email.split('@')[0]}-${p.slice(1).replace(/\//g, '-')}-${width}.png` });
+        if (p === '/dashboard' || p === '/manager' || p === '/integrations' || p === '/help') await page.screenshot({ path: `${OUT}/${email.split('@')[0]}-${p.slice(1).replace(/[\/?=]/g, '-')}-${theme}-${width}.png` });
       }
       await ctx.close();
     }

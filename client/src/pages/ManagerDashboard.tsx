@@ -3,6 +3,7 @@ import { Bar, CartesianGrid, ComposedChart, Legend, Line, ResponsiveContainer, T
 import { Award, CalendarDays, CheckCircle2, ClipboardCheck, Clock, OctagonAlert, PlayCircle, ShieldCheck, Users } from 'lucide-react';
 import { api } from '@/api';
 import { Avatar, Badge, Button, Card, EmptyState, ErrorState, MiniBar, PageSkeleton, Stat, cx } from '@/components/ui';
+import { GettingStarted, ViasocketCard } from '@/components/Onboarding';
 import { DIM_LABEL, DIMS, fmtDate, relTime } from '@/lib/format';
 import { useAsync, useDataChanged } from '@/lib/hooks';
 
@@ -36,6 +37,11 @@ export default function ManagerDashboard() {
         <Stat label="Blocked" value={data.blocked} tone={data.blocked ? 'danger' : undefined} icon={<OctagonAlert size={14} />} />
         <Stat label="Pending reviews" value={data.pending_reviews} tone={data.pending_reviews ? 'accent' : undefined} icon={<ClipboardCheck size={14} />} />
         <Stat label="Team delivery" value={pctTxt(data.delivery_pct)} hint="Due this week & completed" icon={<ShieldCheck size={14} />} />
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-3 items-start">
+        <GettingStarted />
+        <ViasocketCard />
       </div>
 
       <div className="grid gap-3 lg:grid-cols-3">

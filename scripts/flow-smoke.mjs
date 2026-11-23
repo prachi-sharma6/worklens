@@ -144,7 +144,7 @@ await step('reject requires a note', async () => {
   await page.getByText(/note is required|required/i).first().waitFor();
 });
 await step('weights must total 100', async () => {
-  await page.goto(`${BASE}/settings`);
+  await page.goto(`${BASE}/settings?tab=scoring`);
   const inputs = page.locator('input[type=number]');
   await inputs.first().fill('40');
   await page.getByText(/115|must total|total/i).first().waitFor();

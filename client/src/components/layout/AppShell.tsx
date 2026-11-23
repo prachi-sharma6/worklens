@@ -7,7 +7,9 @@ import {
 import { Avatar, Badge, Button, Popover, SlideOver, cx } from '@/components/ui';
 import { TaskForm } from '@/components/TaskForm';
 import { CommandPalette } from './CommandPalette';
-import { EMPLOYEE_NAV, MANAGER_NAV } from './nav';
+import { EMPLOYEE_GROUPS, MANAGER_GROUPS, FOOTER_NAV, type NavItem } from './nav';
+import { ConnectedAppsPill, IntegrationsProvider, PoweredByViasocket } from '@/components/IntegrationStatus';
+import { markVisited } from '@/components/Onboarding';
 import { useAuth, useTheme, useUI } from '@/context';
 import { useMediaQuery } from '@/lib/hooks';
 
@@ -23,7 +25,7 @@ export function AppShell() {
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => { try { localStorage.setItem('wl-sidebar', collapsed ? '1' : '0'); } catch { /* ignore */ } }, [collapsed]);
-  useEffect(() => { setDrawer(false); mainRef.current?.scrollTo(0, 0); }, [loc.pathname]);
+  useEffect(() => { setDrawer(false); mainRef.current?.scrollTo(0, 0); markVisited(loc.pathname); }, [loc.pathname]);
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); ui.setPaletteOpen(true); }
@@ -32,7 +34,7 @@ export function AppShell() {
     return () => window.removeEventListener('keydown', h);
   }, [ui]);
 
-  const items = useMemo(() => (user?.role === 'manager' ? MANAGER_NAV : EMPLOYEE_NAV), [user]);
+  const groups = useMemo(() => (user?.role === 'manager' ? MANAGER_GROUPS : EMPLOYEE_GROUPS), [user]);
   if (!user) return null;
   const narrow = collapsed && !isMobile;
 
@@ -48,20 +50,18 @@ export function AppShell() {
           <Button variant="primary" className="w-full" onClick={ui.openComposer} icon={<Plus size={15} />} title="Add task">{!narrow && 'Add Task'}</Button>
         </div>
       )}
-      <nav className={cx('flex-1 overflow-y-auto px-3 py-3 space-y-0.5 scrollbar-thin', narrow && 'px-2')}>
-        {items.map(({ to, label, icon: Icon }) => (
-          <NavLink key={to} to={to} title={label}
-            className={({ isActive }) => cx('flex items-center gap-2.5 h-8 rounded-md px-2.5 text-[13px] font-medium transition', narrow && 'justify-center px-0',
-              isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-subtle hover:text-fg')}>
-            <Icon size={16} className="shrink-0" />{!narrow && label}
-          </NavLink>
+      <nav className={cx('flex-1 overflow-y-auto px-3 py-3 scrollbar-thin', narrow && 'px-2')} aria-label="Main">
+        {groups.map((g) => (
+          <div key={g.title} className="mb-3">
+            {!narrow && <p className="px-2.5 mb-1 text-[10px] font-semibold uppercase tracking-wider text-faint">{g.title}</p>}
+            <div className="space-y-0.5">{g.items.map((it) => <SideLink key={it.to} it={it} narrow={narrow} />)}</div>
+          </div>
         ))}
-        <div className="pt-3 mt-3 border-t border-border">
-          <NavLink to="/settings" title="Settings" className={({ isActive }) => cx('flex items-center gap-2.5 h-8 rounded-md px-2.5 text-[13px] font-medium transition', narrow && 'justify-center px-0', isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-subtle hover:text-fg')}>
-            <Settings size={16} />{!narrow && 'Settings'}
-          </NavLink>
+        <div className="pt-3 mt-1 border-t border-border space-y-0.5">
+          {FOOTER_NAV.map((it) => <SideLink key={it.to} it={it} narrow={narrow} />)}
         </div>
       </nav>
+      <PoweredByViasocket narrow={narrow} />
       {!isMobile && (
         <button onClick={() => setCollapsed((c) => !c)} className="h-10 border-t border-border flex items-center justify-center gap-2 text-xs text-faint hover:text-fg" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
           {collapsed ? <ChevronsRight size={15} /> : <><ChevronsLeft size={15} /> Collapse</>}
@@ -71,6 +71,7 @@ export function AppShell() {
   );
 
   return (
+    <IntegrationsProvider>
     <div className="flex h-full">
       {!isMobile && <aside className={cx('shrink-0 border-r border-border bg-surface transition-[width] duration-200', collapsed ? 'w-[60px]' : 'w-60')}>{sidebar}</aside>}
       {isMobile && drawer && (
@@ -88,6 +89,7 @@ export function AppShell() {
             <kbd className="hidden sm:inline text-[10px] border border-border rounded px-1 py-0.5">Ctrl K</kbd>
           </button>
           <div className="ml-auto flex items-center gap-1.5">
+            <ConnectedAppsPill />
             <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme" title="Toggle theme">{theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</Button>
             <Popover align="right" width="w-60" trigger={({ toggle: t }) => (
               <button onClick={t} className="flex items-center gap-2 rounded-md p-1 hover:bg-subtle" aria-label="User menu"><Avatar name={user.name} color={user.avatar_color} size={28} /></button>
@@ -114,9 +116,21 @@ export function AppShell() {
       </SlideOver>
       <CommandPalette />
     </div>
+    </IntegrationsProvider>
   );
 }
 
 function MenuBtn({ icon, children, onClick }: { icon: React.ReactNode; children: React.ReactNode; onClick: () => void }) {
   return <button onClick={onClick} className="w-full flex items-center gap-2 h-8 px-2 rounded text-[13px] text-muted hover:bg-subtle hover:text-fg">{icon}{children}</button>;
+}
+
+function SideLink({ it, narrow }: { it: NavItem; narrow: boolean }) {
+  const Icon = it.icon;
+  return (
+    <NavLink to={it.to} title={`${it.label} — ${it.hint}`}
+      className={({ isActive }) => cx('flex items-center gap-2.5 h-8 rounded-md px-2.5 text-[13px] font-medium transition', narrow && 'justify-center px-0',
+        isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-subtle hover:text-fg')}>
+      <Icon size={16} className="shrink-0" />{!narrow && it.label}
+    </NavLink>
+  );
 }

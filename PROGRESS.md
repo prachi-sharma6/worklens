@@ -21,6 +21,14 @@
 - **Playwright** via `playwright-core` driving the locally installed Edge — no browser download.
 - Managers can open task details, reports (`?user=ID`) and profiles for their team; nav shows only pages 11–14 for managers.
 
+## UI visibility pass (Nov 23 2026, local only — not deployed)
+- Connected apps visible everywhere: top-bar pill (AI · Slack · Gmail with live dots → details popover), sidebar “Powered by viaSocket” badge, new **Integrations** page for both roles (viaSocket intro, status cards with account/channel/recipients and what each app does, the 7 automations with apps, on/off and last run; manager controls below; employee Slack-DM opt-in).
+- Navigation: grouped sidebar (My work / Insights / Reports / Connected apps) with hints on every item; managers gained Reports, Integrations and “How to use”; Ctrl K searches hints too.
+- Dashboards: role-aware “How to use WorkLens” checklist ticked from real data (hideable, restorable from Help) + “Powered by viaSocket” card.
+- New **How to use** page (quick start per role, every page in one line, scoring summary, automations, FAQ). Settings split into tabs (`?tab=` deep links).
+- Verified: 88/88 tests, typecheck, build, isolated smoke 20/20 with 0 console errors, responsive sweep 144 visits clean.
+- Design ideas canvas (private): https://claude.ai/artifact/CVB1BCEkz92RqAQe8WKVQs
+
 ## Deploy (Embarko, Nov 23 2026)
 - Live: https://worklens.embarko.app · app id `cmwstqibz0096m1ti403l72sw` · claimed with the Embarko key (saved in `~/.embarko/credentials`) · **locked** to the Embarko workspace (your choice; viaSocket AI/Slack/Gmail stay on behind it).
 - Changes for Embarko’s rules: `server/src/config.js` (PORT/0.0.0.0, `DATA_DIR` for DB + uploads, generated JWT secret in DATA_DIR, secure cookies, APP_URL from APP_NAME); node-cron + the 3 s worker removed → events run right after the request that queued them, and `GET /api/cron/tick` (CRON_SECRET) runs due reports/interventions/outbox, called every 5 min by the `embarko.json` schedule (locally: a 1-min interval). Due jobs fire within a 2 h window, de-duplicated. Root `npm start` no longer builds (Embarko runs `npm run build` itself); `engines.node >= 22.13`.

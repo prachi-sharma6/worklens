@@ -6,6 +6,7 @@ import { api, type DashboardSummary, type TaskWithMeta } from '@/api';
 import { Badge, Button, Card, EmptyState, ErrorState, PageSkeleton, PriorityIcon, Stat, StatusPill, cx } from '@/components/ui';
 import { useAuth, useUI } from '@/context';
 import { DailyInsightCard } from '@/components/AiCards';
+import { GettingStarted, ViasocketCard } from '@/components/Onboarding';
 import { useAsync, useDataChanged } from '@/lib/hooks';
 import { dueLabel, fmtDateTime, greeting, relTime } from '@/lib/format';
 
@@ -55,6 +56,11 @@ export default function EmployeeDashboard() {
           <div className="mt-1.5 text-2xl font-semibold tnum">{data.completion_pct == null ? '—' : `${data.completion_pct}%`}</div>
           <div className="h-1.5 rounded-full bg-subtle mt-2 overflow-hidden"><div className="h-full bg-accent rounded-full transition-all" style={{ width: `${data.completion_pct ?? 0}%` }} /></div>
         </div>
+      </div>
+
+      <div className="grid gap-3 lg:grid-cols-3 items-start">
+        <GettingStarted />
+        <ViasocketCard />
       </div>
 
       {data.attention.length > 0 && (

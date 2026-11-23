@@ -60,8 +60,8 @@ export function IntegrationsPanel() {
 
   const by = (app: string) => status.data?.find((s) => s.app === app);
   return (
-    <Card title={<span className="flex items-center gap-2"><span className="text-faint"><PlugZap size={15} /></span>Integrations · viaSocket</span>}
-      subtitle="Slack alerts, Gmail reports and AI summaries run through viaSocket. Connect once; WorkLens fills every message from its own records.">
+    <Card title={<span className="flex items-center gap-2"><span className="text-faint"><PlugZap size={15} /></span>Manage connections & automations</span>}
+      subtitle="Connect or reconnect apps, choose where alerts and reports go, switch automations on or off, and see every run.">
       {status.loading && !status.data ? <Skeleton className="h-40" /> : (
         <div className="space-y-4">
           <AiCard s={by('ai')} />

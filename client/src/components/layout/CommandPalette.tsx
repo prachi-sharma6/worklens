@@ -29,11 +29,11 @@ export function CommandPalette() {
   const go = (to: string) => { close(); nav(to); };
 
   const items: Item[] = useMemo(() => {
-    const pages = [...(user?.role === 'manager' ? MANAGER_NAV : EMPLOYEE_NAV), { to: '/settings', label: 'Settings', icon: FileText }];
+    const pages = user?.role === 'manager' ? MANAGER_NAV : EMPLOYEE_NAV;
     const s = q.trim().toLowerCase();
     const out: Item[] = [];
     if (user?.role === 'employee' && (!s || 'add task new create'.includes(s) || s.startsWith('add'))) out.push({ key: 'new', label: 'Add task', hint: 'Action', icon: <Plus size={15} />, run: () => { close(); openComposer(); } });
-    pages.filter((p) => !s || p.label.toLowerCase().includes(s)).forEach((p) => out.push({ key: p.to, label: p.label, hint: 'Page', icon: <p.icon size={15} />, run: () => go(p.to) }));
+    pages.filter((p) => !s || p.label.toLowerCase().includes(s) || p.hint.toLowerCase().includes(s)).forEach((p) => out.push({ key: p.to, label: p.label, hint: p.hint, icon: <p.icon size={15} />, run: () => go(p.to) }));
     res.people.forEach((u) => out.push({ key: `u${u.id}`, label: u.name, hint: u.title, icon: <Avatar name={u.name} color={u.avatar_color} size={18} />, run: () => go(`/people/${u.id}`) }));
     res.tasks.forEach((t) => out.push({ key: `t${t.id}`, label: t.title, hint: user?.role === 'manager' ? t.user_name : undefined, icon: <UserIcon size={15} className="opacity-0" />, right: <StatusPill status={t.status} />, run: () => go(`/tasks/${t.id}`) }));
     return out;
