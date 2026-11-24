@@ -3,7 +3,7 @@ import { BarChart3, CalendarDays, CalendarRange, FileCheck2, Gauge, HelpCircle, 
 export interface NavItem { to: string; label: string; icon: React.ElementType; hint: string }
 export interface NavGroup { title: string; items: NavItem[] }
 
-const INTEGRATIONS: NavItem = { to: '/integrations', label: 'Integrations', icon: PlugZap, hint: 'Which apps are connected (viaSocket AI, Slack, Gmail) and what they do' };
+const INTEGRATIONS: NavItem = { to: '/integrations', label: 'Integrations', icon: PlugZap, hint: 'Which apps are connected (viaSocket AI, Slack, Gmail, M91 phone alerts) and what they do' };
 const HELP: NavItem = { to: '/help', label: 'How to use', icon: HelpCircle, hint: 'A guide to every page, score and automation' };
 const SETTINGS: NavItem = { to: '/settings', label: 'Settings', icon: Settings, hint: 'Profile, theme, notifications' };
 

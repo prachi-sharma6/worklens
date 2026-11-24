@@ -1,0 +1,82 @@
+WEBVTT
+
+00:00:00.450 --> 00:00:05.175
+This is WorkLens, a work-measurement app built for the viaSocket challenge.
+
+00:00:05.125 --> 00:00:07.262
+It doesn't measure how busy you look.
+
+00:00:07.262 --> 00:00:13.362
+It measures what you actually deliver: outcomes, backed by evidence, and verified by your manager.
+
+00:00:14.440 --> 00:00:18.652
+Let's sign in as Aarav, one of the engineers, with a single click.
+
+00:00:19.665 --> 00:00:26.177
+His dashboard shows what to focus on right now, today's plan, and anything that needs his attention.
+
+00:00:27.193 --> 00:00:31.293
+Every task starts with an outcome: what will be true when it's done.
+
+00:00:31.243 --> 00:00:35.080
+Aarav writes one, sets a high priority, and saves.
+
+00:00:36.197 --> 00:00:43.972
+When he starts it, viaSocket AI suggests a measurable outcome and the likely impact, using only his own records.
+
+00:00:43.922 --> 00:00:49.109
+He stays in control: he can apply the suggestions, or dismiss them.
+
+00:00:50.179 --> 00:00:51.579
+Stuck on something?
+
+00:00:51.529 --> 00:00:59.954
+He reports the blocker and names who he's waiting on, so his manager knows right away, and external delays never count against him.
+
+00:01:01.025 --> 00:01:09.900
+Once it's unblocked and done, he wraps it up with evidence: a pull request, a document, a screenshot, or a short explanation.
+
+00:01:09.850 --> 00:01:11.662
+Now it's ready for review.
+
+00:01:12.726 --> 00:01:20.663
+On Performance, Aarav sees five scores: productivity, quality, impact, consistency, and ownership.
+
+00:01:20.613 --> 00:01:24.451
+Every score shows its formula and the real numbers behind it.
+
+00:01:24.451 --> 00:01:26.863
+Hours worked never raise a score.
+
+00:01:27.939 --> 00:01:30.714
+Now let's switch to Meera, the manager.
+
+00:01:30.664 --> 00:01:37.876
+Her dashboard is the thirty-second view: work waiting for review, open blockers, and the whole team at a glance.
+
+00:01:38.950 --> 00:01:44.750
+She opens Aarav's task, checks the evidence, gives it four stars, and verifies it.
+
+00:01:44.700 --> 00:01:47.662
+Every decision is recorded on his timeline.
+
+00:01:48.733 --> 00:01:54.408
+Team Performance shows distributions and trends, never rankings or leaderboards.
+
+00:01:54.358 --> 00:01:57.683
+And the daily and weekly reports write themselves.
+
+00:01:58.733 --> 00:02:07.708
+Everything connects through viaSocket: AI summaries, Slack alerts, and Gmail reports, with no passwords stored in WorkLens.
+
+00:02:07.658 --> 00:02:19.020
+And for work that can't wait, like a critical task that's overdue or blocked, M91 rings the manager's phone until someone answers, and stops by itself once it's fixed.
+
+00:02:20.083 --> 00:02:21.295
+WorkLens.
+
+00:02:21.245 --> 00:02:24.245
+Fair, explainable measurement of real work.
+
+00:02:24.245 --> 00:02:26.008
+Powered by viaSocket.

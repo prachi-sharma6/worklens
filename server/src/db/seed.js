@@ -20,6 +20,9 @@ export function seedDatabase(db, now = new Date(), opts = {}) {
     // Users are re-inserted with the same ids, so rows that survive a reset (viaSocket connections) stay valid:
     // check foreign keys once at commit instead of on every delete.
     db.exec('PRAGMA defer_foreign_keys = ON');
+    // Keep the "integrations switched on at" marker: without it the first event after a reset would be dated
+    // before a freshly made marker and skipped as history (outbox.js enabledAt).
+    const keep = db.all("SELECT key, value_json FROM settings WHERE key IN ('integrations_enabled_at')");
     for (const t of TABLES) db.exec(`DELETE FROM ${t}`);
     for (const t of s.teams) db.insert('teams', t);
     for (const u of s.users) db.insert('users', { ...u, password_hash: hash, created_at: nowIso, updated_at: nowIso });
@@ -30,6 +33,7 @@ export function seedDatabase(db, now = new Date(), opts = {}) {
     for (const r of s.reviews) db.insert('manager_reviews', r);
     for (const e of s.timeline) db.insert('activity_timeline', e);
     for (const [key, value] of Object.entries(s.settings)) db.insert('settings', { key, value_json: JSON.stringify(value) });
+    for (const k of keep) db.insert('settings', k);
   });
   if (opts.clearUploads && fs.existsSync(UPLOAD_DIR)) {
     for (const f of fs.readdirSync(UPLOAD_DIR)) if (f !== '.gitkeep') fs.rmSync(path.join(UPLOAD_DIR, f), { force: true });

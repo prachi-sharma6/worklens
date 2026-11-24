@@ -9,3 +9,4 @@ screenshots/
 .DS_Store
 server/data/*.db*
 docs-cache/
+demo-build/

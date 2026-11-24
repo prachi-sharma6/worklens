@@ -84,9 +84,12 @@ export interface Settings {
 }
 export interface NotificationPrefs { in_app: boolean; slack_dm: boolean; email_digest: boolean }
 export interface ConnectionSettings { channel_id?: string; channel_name?: string; user_map?: Record<string, { id: string; label: string | null }>; recipients?: string[] }
-export interface IntegrationConnection { app: 'slack' | 'gmail'; label: string | null; connected_at: string; flow_ready: boolean; expired: boolean; settings: ConnectionSettings }
-export interface IntegrationStatus { app: 'slack' | 'gmail' | 'ai'; label: string; connected: boolean; expired: boolean; detail: string; connection?: IntegrationConnection | null }
-export interface ConnectInfo { token: string; serviceIds: { slack: string; gmail: string }; actions: { slack: string[]; gmail: string[] }; reconnect: Partial<Record<'slack' | 'gmail', string>> }
+export type ConnectApp = 'slack' | 'gmail' | 'm91';
+export interface IntegrationConnection { app: ConnectApp; label: string | null; connected_at: string; flow_ready: boolean; expired: boolean; settings: ConnectionSettings }
+export interface IntegrationStatus { app: ConnectApp | 'ai'; label: string; connected: boolean; expired: boolean; detail: string; connection?: IntegrationConnection | null }
+export interface ConnectInfo { token: string; serviceIds: Record<ConnectApp, string>; actions: Record<ConnectApp, string[]>; reconnect: Partial<Record<ConnectApp, string>> }
+export type M91Kind = 'critical_overdue' | 'critical_blocked' | 'blocker_stuck' | 'delivery_failing' | 'test';
+export interface M91Alert { kind: M91Kind; title: string; severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'; path: string | null; status?: 'open' | 'closed'; opened_at?: string; closed_at?: string | null; close_reason?: string | null }
 export interface AiReportRef { saved_id: number; key: string; summary_text: string; generated_at: string; ai: { model: string; records: number; message_id: string } | null; analysis: { achievements: string[]; recurring_problems: { dependency: string; occurrences: number; note: string }[]; planned_vs_actual: string; suggestions: string[] } | null; source_task_ids: number[] }
 export interface IntegrationEvent { id: number; event_type: string; payload_json: unknown; status: 'queued' | 'sent' | 'failed' | 'skipped_not_connected'; attempts: number; last_error: string | null; created_at: string; processed_at?: string | null; result_json?: Record<string, unknown> | null }
 

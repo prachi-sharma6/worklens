@@ -9,6 +9,7 @@
 | 5 — viaSocket (AI + Slack + Gmail + schedules) | ✅ Done — 2 items UNTESTED (see viasocket-plan.md) |
 | 6 — Tests, polish, README | ✅ Done |
 | Deploy — Embarko | ✅ Live at https://worklens.embarko.app (locked) |
+| M91 phone alerts (via viaSocket) | ✅ Built — real run UNTESTED (needs Connect M91) · not deployed |
 
 ## Decisions
 - **Client in TypeScript**, server will be plain Node ESM. Tailwind v3 with CSS-variable tokens for light/dark.
@@ -20,6 +21,21 @@
 - **Windows Smart App Control blocks unsigned native `.node` addons** in this folder (rollup's native binary failed with "An Application Control policy has blocked this file"). Fix: root devDependency `rollup` aliased to `@rollup/wasm-node`; esbuild's signed exe runs fine. **Phase 2 impact:** `better-sqlite3` and `bcrypt` are native addons and will likely be blocked too → plan is to use Node's built-in `node:sqlite` (Node 26 here) and `bcryptjs`. Same SQL, no native code.
 - **Playwright** via `playwright-core` driving the locally installed Edge — no browser download.
 - Managers can open task details, reports (`?user=ID`) and profiles for their team; nav shows only pages 11–14 for managers.
+
+## Demo video + fixes (Nov 24 2026)
+- Landing page plays a 2:27 walkthrough (1080p, voiceover by Microsoft neural voice “Ava” via edge-tts, English captions): `client/public/demo/`. Rebuild with `npm run demo:video` (records the real built app on a DB copy at :4200; one real viaSocket AI call). Checked: no silence ≥ 1.6 s in the voice, no page errors, only ~250 ms natural pauses after saves.
+- **Outbox bug fixed:** when `drain()` had nothing to do it finished synchronously and left a settled promise in `draining`, so no later event ever ran until a restart (only hit when the outbox was empty at startup). Regression test added.
+- **Demo reset bug fixed:** reset wiped `integrations_enabled_at`, so the first event after a reset was skipped as “history”. Reset now keeps it. Test added.
+- **UI:** popovers inside cards (“How is this calculated?”) were drawn under the next cards; the profile menu and connected-apps panel were drawn under the page. Both fixed (stacking contexts).
+- **M91 connect:** a “closed” guess from the Connect popup is no longer shown as an error; one save per user+app at a time and the existing flow is reused (no duplicate “WorkLens → M91” flows); account label shown cleanly. 4 duplicate flows moved to viaSocket’s bin, 1 kept.
+- Verified: 103/103 tests, typecheck, `viasocket-apps check server` 0 FAIL.
+
+## M91 phone alerts (Nov 24 2026 — local, not deployed)
+- Manager connects **M91** through viaSocket (Settings → Integrations), picks the channel to ring, sends a LOW test. Flow “WorkLens → M91” (List_Channels v3 + Send_Channel_Alert v6 + Close_Channel_Alert v8); the send link stays inside viaSocket.
+- Rings for: critical task overdue (HIGH), critical task blocked (HIGH), blocker open > 48 h (MEDIUM), last two Slack/Gmail deliveries failed (MEDIUM). Each condition opens once (`m91_alerts`, migration 003) and is closed from code when it clears; max 3 new per check; feature toggle `m91_alerts`.
+- Promotion (lighter than viaSocket): M91 card + automation row on Integrations, M91 in the top-bar/sidebar app status (now “of 4”), landing-page strip, Help FAQ + automations line, footer “phone alerts by M91”.
+- Also: `npm test` glob fixed for Node 22 (`test/*.test.js`); `.claude/launch.json` split into `api` (4000) and `web` (5173); skill pointer → 2026-11-24.3.
+- Verified: 100/100 tests (12 new M91), `viasocket-apps check server` 0 FAIL, typecheck, responsive sweep 144 visits clean. **Not verified:** any real M91 run.
 
 ## Landing page + viaSocket everywhere (Nov 23 2026 — deployed to Embarko, commit c4ad683; scheduled tick ran ok 200, site still locked)
 - Sign-in page is now a landing page: what WorkLens is (viaSocket challenge), one-click demo sign-in with what each account shows, how to use (4 steps per role), “Powered by viaSocket” section (AI, Slack, Gmail, 2,300+ apps), the five scores and fairness rules.

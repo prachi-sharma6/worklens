@@ -16,7 +16,8 @@
     "seed": "npm run seed -w server",
     "test": "npm test -w server",
     "start": "npm start -w server",
-    "smoke:isolated": "node scripts/smoke-isolated.mjs"
+    "smoke:isolated": "node scripts/smoke-isolated.mjs",
+    "demo:video": "npm run build && node scripts/demo/voice.mjs && node scripts/demo/make-video.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

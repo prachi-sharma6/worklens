@@ -81,3 +81,47 @@ AI credits used while building: 5 (enrich, blocker, daily, weekly ×2 — the se
 
 ## VIASOCKET-PENDING
 - None.
+
+---
+
+# M91 phone alerts — plan (Nov 24 2026)
+
+Status: **confirmed ("Yes, build it") and built; real run UNTESTED** (needs the manager to Connect M91 once).
+Skill version `2026-11-24.3`. M91 docs followed: https://m91-api.msg91.com/llms.txt (quickstart, playbook, fields, limitations).
+Your choices: through a viaSocket flow (not a raw send link); the manager connects M91 in WorkLens; moments picked by me.
+
+## What users see
+1. **Settings → Integrations (manager):** "Connect M91" (M91's icon) → pick the M91 channel to ring (once) → "Send test alert" (LOW).
+   The card says what rings and why, the three setup steps, the "You'll be rung when…" list, the install reminder, and what is ringing now.
+2. **Phone alerts** for four named conditions, each with "I'll handle it" (SHARED) / "Seen" (PERSONAL), closed from code when it clears.
+3. Light promotion: M91 card on Integrations, M91 dot in the top-bar/sidebar app status, a strip on the landing page, Help + footer lines.
+
+## Moments (named conditions only — never a generic error hook)
+| condition | severity | customId | closes when |
+| --- | --- | --- | --- |
+| critical task past its deadline, not done (not blocked) | HIGH | `worklens-overdue-task-<task id>` | completed, deleted or deadline moved |
+| open blocker on a critical task | HIGH | `worklens-blocker-<blocker id>` | blocker resolved |
+| open blocker on any other task for > 48 h | MEDIUM | `worklens-blocker-<blocker id>` | blocker resolved |
+| last two Slack/Gmail deliveries both failed | MEDIUM | `worklens-delivery-failing` | the next delivery is sent |
+Not on M91 (on purpose): reviews waiting > 24 h and report digests (Slack is enough — "look at it in the morning"), review decisions (in-app + opt-in Slack DM). No CRITICAL (no money/safety at stake). At most 3 new alerts per check.
+
+## Plan table
+| app | action (key, version) | key of `inputData` | who supplies it | when |
+| --- | --- | --- | --- | --- |
+| m91 | `List_Channels` `v3` (action_id `rowr62kckt5z`) | — (`{}`) | — | every run of the flow (resolves the channel's send link inside viaSocket) |
+| m91 | `Send_Channel_Alert` `v6` (action_id `rowo1ijawy9p`) | `send_link` | the record that names it: the `sendLink` of the channel the manager picked, read from `List_Channels` inside the run (never leaves viaSocket) | per run |
+| m91 | `Send_Channel_Alert` `v6` | channel (stored as `channel_id` + name) | the manager, from their M91 channel list | once, right after Connect; changeable in Settings |
+| m91 | `Send_Channel_Alert` `v6` | `title`, `description`, `severity`, `customId` | the product's code (condition → text, link back, severity, stable id) | per run |
+| m91 | `Send_Channel_Alert` `v6` | `allowResponseOptions` = true, `responseOptions.labels` = "I'll handle it,Seen", `.effects` = "SHARED,PERSONAL" | constant (the playbook's outage shape, right for every user) | constant |
+| m91 | `Send_Channel_Alert` `v6` | `isAutoClose` | constant: false for conditions (closed from code), true for the test | constant |
+| m91 | `Send_Channel_Alert` `v6` | `other`, `attachments`, `callbackUrl`, `responseOptions.require*/optional*` | left out on purpose (default "Something else" stays; no public attachments; the app is locked so callbacks can't reach it) | — |
+| m91 | `Close_Channel_Alert` `v8` (action_id `row2vear3nno`) | `send_link`, `identifier_type` = "customId", `custom_id` | send link as above; the condition's customId | per run |
+
+**Who picks each action:** the product's code. One flow per manager ("WorkLens → M91"), webhook trigger, one step that
+branches on `op` (`channels` | `send` | `close`). `auth_id` + `script_id` stay on the server; the browser never sees the send link.
+**Credits:** every alert/close/channel list is one flow run (List Channels + one action). Toggle: Settings → "M91 phone alerts".
+
+## UNTESTED (M91)
+- Connect M91 → List Channels → Send test alert → Close: no real run yet (needs the manager's M91 account). The step's
+  result mapping (`data._id`, `delivered`…) is from the action page's sample, to be checked against the first real run.
+- `service_action_functions` pass the user's auth_id to Send/Close too (those actions are marked no-auth); switch to `NoAuth` if the first run rejects it.

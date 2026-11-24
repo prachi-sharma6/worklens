@@ -83,7 +83,9 @@ export function AppShell() {
       )}
 
       <div className="flex-1 min-w-0 flex flex-col">
-        <header className="h-14 shrink-0 border-b border-border bg-surface/80 backdrop-blur flex items-center gap-2 px-4 lg:px-6">
+        {/* relative z-30: backdrop-blur makes the header its own stacking context, so without a z-index its popovers
+            (user menu, connected apps) paint underneath the page content that follows it. */}
+        <header className="relative z-30 h-14 shrink-0 border-b border-border bg-surface/80 backdrop-blur flex items-center gap-2 px-4 lg:px-6">
           {isMobile && <Button variant="ghost" size="icon" onClick={() => setDrawer(true)} aria-label="Open menu"><Menu size={18} /></Button>}
           <button onClick={() => ui.setPaletteOpen(true)} className="flex items-center gap-2 h-8 px-2.5 rounded-md border border-border bg-bg text-faint text-xs hover:text-muted hover:border-faint/50 transition w-full max-w-xs">
             <Search size={14} /> <span className="flex-1 text-left">Search pages and tasks…</span>
@@ -114,7 +116,7 @@ export function AppShell() {
           </div>
           <footer className="mx-auto max-w-[1280px] px-4 lg:px-6 pb-6">
             <div className="border-t border-border pt-4 flex flex-col sm:flex-row gap-2 sm:items-center justify-between text-[11px] text-faint">
-              <span>WorkLens · <span className="text-muted">AI, Slack and Gmail</span> powered by <a href="https://viasocket.com" target="_blank" rel="noreferrer" className="text-accent font-semibold hover:underline">viaSocket</a> · built for the viaSocket challenge</span>
+              <span>WorkLens · <span className="text-muted">AI, Slack and Gmail</span> powered by <a href="https://viasocket.com" target="_blank" rel="noreferrer" className="text-accent font-semibold hover:underline">viaSocket</a> · phone alerts by <a href="https://msg91.com" target="_blank" rel="noreferrer" className="text-muted font-semibold hover:underline">M91</a> · built for the viaSocket challenge</span>
               <span className="flex gap-3"><NavLink to="/help" className="hover:text-fg">How to use</NavLink><NavLink to="/integrations" className="hover:text-fg">Connected apps</NavLink></span>
             </div>
           </footer>

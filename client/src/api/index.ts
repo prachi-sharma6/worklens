@@ -2,7 +2,7 @@
 import type {
   Blocker, Comment, CompletePayload, DashboardSummary, Dimension, Evidence, Insights, IntegrationEvent, IntegrationStatus,
   ManagerSummary, NewBlocker, NewEvidence, NewTask, NotificationPrefs, PerformanceView, Report, Review, ReviewPayload,
-  ScoreResult, Settings, Task, PerformanceRecord, ReportHistoryItem, ConnectInfo, IntegrationConnection, TaskFilters, TaskStatus, TaskWithMeta, TimelineEvent, User,
+  ScoreResult, Settings, Task, PerformanceRecord, ReportHistoryItem, ConnectInfo, ConnectApp, IntegrationConnection, M91Alert, TaskFilters, TaskStatus, TaskWithMeta, TimelineEvent, User,
 } from './types';
 import { httpApi } from './http';
 
@@ -53,13 +53,16 @@ export interface Api {
   };
   integrations: {
     status(): Promise<IntegrationStatus[]>; events(): Promise<IntegrationEvent[]>;
-    connectInfo(): Promise<ConnectInfo>; connected(app: 'slack' | 'gmail', authId: string): Promise<IntegrationConnection>;
+    connectInfo(): Promise<ConnectInfo>; connected(app: ConnectApp, authId: string): Promise<IntegrationConnection>;
     slackOptions(field: 'channel' | 'user', search?: string, paginate?: string | null): Promise<{ options: { label: string; value: string }[]; hasMore: boolean; paginate: string | null; message: string | null }>;
     saveSlackChannel(channel_id: string, channel_name: string): Promise<IntegrationConnection>;
     mapSlackUser(user_id: number, slack_user_id: string | null, label: string | null): Promise<IntegrationConnection>;
     saveGmailRecipients(recipients: string[]): Promise<IntegrationConnection>;
-    disconnect(app: 'slack' | 'gmail'): Promise<void>;
-    run(what: 'slack-test' | 'gmail-test' | 'daily' | 'weekly', date?: string): Promise<{ queued: number }>;
+    disconnect(app: ConnectApp): Promise<void>;
+    m91Channels(): Promise<{ channels: { id: string; name: string }[] }>;
+    saveM91Channel(channel_id: string, channel_name: string): Promise<IntegrationConnection>;
+    m91Alerts(): Promise<{ recent: M91Alert[]; holding_now: M91Alert[] }>;
+    run(what: 'slack-test' | 'gmail-test' | 'm91-test' | 'daily' | 'weekly', date?: string): Promise<{ queued: number }>;
     retry(eventId: number): Promise<{ queued: number }>;
   };
   admin: { resetDemo(): Promise<void> };

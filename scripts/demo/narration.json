@@ -1,0 +1,19 @@
+{
+  "voice": "en-US-AvaNeural",
+  "rate": "+0%",
+  "scenes": [
+    { "id": "s01_landing", "text": "This is WorkLens, a work-measurement app built for the viaSocket challenge. It doesn't measure how busy you look. It measures what you actually deliver: outcomes, backed by evidence, and verified by your manager." },
+    { "id": "s02_signin", "text": "Let's sign in as Aarav, one of the engineers, with a single click." },
+    { "id": "s03_dashboard", "text": "His dashboard shows what to focus on right now, today's plan, and anything that needs his attention." },
+    { "id": "s04_create", "text": "Every task starts with an outcome: what will be true when it's done. Aarav writes one, sets a high priority, and saves." },
+    { "id": "s05_ai", "text": "When he starts it, viaSocket AI suggests a measurable outcome and the likely impact, using only his own records. He stays in control: he can apply the suggestions, or dismiss them." },
+    { "id": "s06_blocker", "text": "Stuck on something? He reports the blocker and names who he's waiting on, so his manager knows right away, and external delays never count against him." },
+    { "id": "s07_complete", "text": "Once it's unblocked and done, he wraps it up with evidence: a pull request, a document, a screenshot, or a short explanation. Now it's ready for review." },
+    { "id": "s08_performance", "text": "On Performance, Aarav sees five scores: productivity, quality, impact, consistency, and ownership. Every score shows its formula and the real numbers behind it. Hours worked never raise a score." },
+    { "id": "s09_manager", "text": "Now let's switch to Meera, the manager. Her dashboard is the thirty-second view: work waiting for review, open blockers, and the whole team at a glance." },
+    { "id": "s10_review", "text": "She opens Aarav's task, checks the evidence, gives it four stars, and verifies it. Every decision is recorded on his timeline." },
+    { "id": "s11_team", "text": "Team Performance shows distributions and trends, never rankings or leaderboards. And the daily and weekly reports write themselves." },
+    { "id": "s12_integrations", "text": "Everything connects through viaSocket: AI summaries, Slack alerts, and Gmail reports, with no passwords stored in WorkLens. And for work that can't wait, like a critical task that's overdue or blocked, M91 rings the manager's phone until someone answers, and stops by itself once it's fixed." },
+    { "id": "s13_close", "text": "WorkLens. Fair, explainable measurement of real work. Powered by viaSocket." }
+  ]
+}

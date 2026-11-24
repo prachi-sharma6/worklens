@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import {
-  ArrowRight, Bot, CheckCircle2, ExternalLink, FileCheck2, Gauge, LineChart, ListChecks, Mail, MessageSquare, Moon, PlugZap,
+  ArrowRight, BellRing, Bot, CheckCircle2, PlayCircle, ExternalLink, FileCheck2, Gauge, LineChart, ListChecks, Mail, MessageSquare, Moon, PlugZap,
   Scale, ShieldCheck, Sparkles, Sun, Target, UserCheck,
 } from 'lucide-react';
 import { Avatar, Button, Field, cx } from '@/components/ui';
 import { errMsg, useAuth, useTheme } from '@/context';
 
 const VIASOCKET_URL = 'https://viasocket.com';
+const MSG91_URL = 'https://msg91.com';
 
 const DEMO = [
   { email: 'manager@worklens.dev', name: 'Meera Kapoor', role: 'Manager', color: '#5EEAD4', sees: 'Review work, see the team, connect Slack & Gmail via viaSocket' },
@@ -28,7 +29,7 @@ const STEPS = {
   manager: [
     [PlugZap, 'Connect Slack & Gmail', 'One click each through viaSocket. Alerts go to your channel, reports to your inbox.'],
     [UserCheck, 'Review the evidence', 'Verify, ask to clarify or reject — every decision is recorded and the person is told.'],
-    [Gauge, 'Unblock the team', 'See who is waiting on what, for how long. viaSocket alerts you when something needs you.'],
+    [Gauge, 'Unblock the team', 'See who is waiting on what, for how long. viaSocket alerts you in Slack — and M91 rings your phone when it can’t wait.'],
     [Scale, 'Read fair scores', 'Distributions and trends, never rankings. Adjust a score only with a written reason.'],
   ],
 } as const;
@@ -87,6 +88,7 @@ export default function Login() {
           <span className="font-display text-lg font-semibold">WorkLens</span>
           <ViasocketBadge className="hidden sm:inline-flex" />
           <nav aria-label="Sections" className="ml-auto hidden md:flex items-center gap-1 text-sm">
+            <a href="#demo" className="px-3 h-8 inline-flex items-center rounded-full text-muted hover:text-fg hover:bg-subtle no-underline">Watch demo</a>
             <a href="#how" className="px-3 h-8 inline-flex items-center rounded-full text-muted hover:text-fg hover:bg-subtle no-underline">How to use</a>
             <a href="#viasocket" className="px-3 h-8 inline-flex items-center rounded-full text-muted hover:text-fg hover:bg-subtle no-underline">Powered by viaSocket</a>
             <a href="#scores" className="px-3 h-8 inline-flex items-center rounded-full text-muted hover:text-fg hover:bg-subtle no-underline">How you’re measured</a>
@@ -119,7 +121,10 @@ export default function Login() {
                 );
               })}
             </ul>
-            <a href="#how" className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-accent no-underline hover:underline">How to use WorkLens <ArrowRight size={14} /></a>
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
+              <a href="#demo" className="inline-flex items-center gap-1.5 text-sm font-medium text-accent no-underline hover:underline"><PlayCircle size={16} />Watch the 2-minute demo</a>
+              <a href="#how" className="inline-flex items-center gap-1.5 text-sm font-medium text-muted no-underline hover:text-fg">How to use WorkLens <ArrowRight size={14} /></a>
+            </div>
           </div>
 
           <div id="signin" className="card p-6 lg:sticky lg:top-20">
@@ -149,6 +154,20 @@ export default function Login() {
               </form>
             </details>
             {error && <p className="mt-3 text-xs text-danger" role="alert">{error}</p>}
+          </div>
+        </section>
+
+        {/* Demo video */}
+        <section id="demo" className="py-10 border-t border-border scroll-mt-16">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-accent">See it in two minutes</p>
+          <h2 className="font-display text-3xl font-semibold tracking-tight mt-2">A real walkthrough, start to finish</h2>
+          <p className="text-sm text-muted mt-2 max-w-2xl">An employee plans a task, gets a viaSocket AI suggestion, reports a blocker and finishes with evidence; the manager verifies it and checks the team, then the connected apps — viaSocket and M91 phone alerts. Recorded in the real app with demo data; captions available.</p>
+          <div className="mt-6 card overflow-hidden p-0 bg-black">
+            <video className="block w-full aspect-video" controls preload="metadata" playsInline poster="/demo/worklens-demo-poster.jpg" aria-label="WorkLens demo video with voiceover">
+              <source src="/demo/worklens-demo.mp4" type="video/mp4" />
+              <track kind="captions" src="/demo/worklens-demo.en.vtt" srcLang="en" label="English" />
+              Your browser can’t play this video. <a href="/demo/worklens-demo.mp4">Download the demo (MP4)</a>.
+            </video>
           </div>
         </section>
 
@@ -199,6 +218,14 @@ export default function Login() {
               );
             })}
           </div>
+          <div className="card mt-4 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+            <span className="h-10 w-10 rounded-xl bg-danger-soft flex items-center justify-center shrink-0"><BellRing size={18} className="text-danger" /></span>
+            <div className="flex-1">
+              <h3 className="font-semibold">Phone alerts by M91 <span className="text-xs font-normal text-faint">from MSG91 · connected through viaSocket</span></h3>
+              <p className="text-xs text-muted mt-1 leading-relaxed">When work can’t wait — a critical task overdue or blocked, someone stuck for two days, alerts failing to send — M91 rings the manager’s phone, even on silent, until someone answers. It stops by itself once the problem is fixed.</p>
+            </div>
+            <a href={MSG91_URL} target="_blank" rel="noreferrer" className="text-xs font-medium text-accent hover:underline no-underline inline-flex items-center gap-1 shrink-0">About MSG91 <ExternalLink size={12} /></a>
+          </div>
         </section>
 
         {/* Scores */}
@@ -222,7 +249,11 @@ export default function Login() {
       <footer className="border-t border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row gap-2 sm:items-center justify-between text-xs text-faint">
           <span>WorkLens — built for the <span className="text-fg font-medium">viaSocket</span> challenge “How can you and your work be measured?”</span>
-          <a href={VIASOCKET_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-muted hover:text-fg no-underline">Powered by viaSocket <ExternalLink size={12} /></a>
+          <span className="inline-flex items-center gap-3">
+            <a href={VIASOCKET_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-muted hover:text-fg no-underline">Powered by viaSocket <ExternalLink size={12} /></a>
+            <span className="text-faint">·</span>
+            <a href={MSG91_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-muted hover:text-fg no-underline">Phone alerts by M91 <ExternalLink size={12} /></a>
+          </span>
         </div>
       </footer>
     </div>

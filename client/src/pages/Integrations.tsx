@@ -3,16 +3,17 @@ import { ArrowRight, CheckCircle2, CircleDashed, ExternalLink, PlugZap, Sparkles
 import { api, type IntegrationEvent, type IntegrationStatus } from '@/api';
 import { Badge, Card, Skeleton, Toggle, cx } from '@/components/ui';
 import { IntegrationsPanel } from '@/components/Integrations';
-import { AppLogo, AppStatusRow, VIASOCKET_URL, stateOf, useIntegrationStatus } from '@/components/IntegrationStatus';
+import { ALL_APPS, AppLogo, AppStatusRow, VIASOCKET_URL, stateOf, useIntegrationStatus, type AppKey } from '@/components/IntegrationStatus';
 import { errMsg, useAuth, useToast } from '@/context';
 import { relTime } from '@/lib/format';
 import { useAsync } from '@/lib/hooks';
 
-type App = 'ai' | 'slack' | 'gmail';
+type App = AppKey;
 const APP_WHAT: Record<App, { title: string; does: string[] }> = {
   ai: { title: 'viaSocket AI', does: ['Suggests a measurable outcome and impact for new tasks', 'Reads unclear blockers to name who you’re waiting on', 'Writes daily and weekly report summaries from your records'] },
   slack: { title: 'Slack', does: ['Alerts the manager about blockers, work ready for review, and items needing attention', 'Posts the daily and weekly team digest', 'Can DM teammates when their work is reviewed (opt-in)'] },
   gmail: { title: 'Gmail', does: ['Emails the daily team report at workday end', 'Emails the weekly analysis on Fridays', 'Sends from the manager’s own Gmail account'] },
+  m91: { title: 'M91 phone alerts', does: ['Rings the manager’s phone — even on silent — when a critical task is overdue or blocked', 'Rings when someone has been blocked for more than 2 days, or Slack/Gmail sends keep failing', 'Stops by itself as soon as the problem is fixed'] },
 };
 
 interface Automation { name: string; when: string; apps: App[]; features: string[]; events: string[] }
@@ -23,6 +24,7 @@ const AUTOMATIONS: Automation[] = [
   { name: 'Daily team report', when: 'Weekdays at workday end', apps: ['ai', 'slack', 'gmail'], features: ['ai_reports', 'slack_alerts', 'email_reports'], events: ['report.daily'] },
   { name: 'Weekly analysis', when: 'Fridays at 17:00', apps: ['ai', 'slack', 'gmail'], features: ['ai_reports', 'slack_alerts', 'email_reports'], events: ['report.weekly'] },
   { name: 'Needs-attention alerts', when: 'Reviews > 24 h, blockers > 48 h, overdue critical work', apps: ['slack'], features: ['slack_alerts'], events: ['intervention'] },
+  { name: 'Phone alerts for work that can’t wait', when: 'Critical task overdue or blocked, blocker stuck > 48 h, deliveries failing', apps: ['m91'], features: ['m91_alerts'], events: ['m91.alert', 'm91.close'] },
   { name: 'Review decision DM', when: 'A manager verifies, rejects or asks to clarify', apps: ['slack'], features: ['employee_dms'], events: ['review.decided'] },
 ];
 
@@ -42,13 +44,13 @@ export default function IntegrationsPage() {
           <h1 className="h-page flex items-center gap-2"><PlugZap size={20} className="text-accent" />Integrations</h1>
           <p className="text-sm text-muted mt-0.5">What WorkLens is connected to, what each connection does, and every automation that uses it.</p>
         </div>
-        <Badge tone={connected === 3 ? 'success' : connected ? 'warning' : 'neutral'} className="h-7 px-2.5 text-xs self-start sm:self-auto">{items ? `${connected} of 3 apps connected` : 'Checking…'}</Badge>
+        <Badge tone={connected === ALL_APPS.length ? 'success' : connected ? 'warning' : 'neutral'} className="h-7 px-2.5 text-xs self-start sm:self-auto">{items ? `${connected} of ${ALL_APPS.length} apps connected` : 'Checking…'}</Badge>
       </div>
 
       <ViasocketHero />
 
-      <div className="grid gap-3 md:grid-cols-3">
-        {(['ai', 'slack', 'gmail'] as const).map((a) => <AppCard key={a} app={a} s={by(a)} isManager={isManager} />)}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {ALL_APPS.map((a) => <AppCard key={a} app={a} s={by(a)} isManager={isManager} />)}
       </div>
 
       <Card title={<span className="flex items-center gap-1.5"><Workflow size={15} className="text-accent" />Automations</span>}

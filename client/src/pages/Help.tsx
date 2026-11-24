@@ -15,9 +15,9 @@ const QUICKSTART = {
     ['Reflect', 'Performance shows your five scores with the formula and real numbers behind each. Reports are ready to share.'],
   ],
   manager: [
-    ['Connect', 'Integrations → connect Slack and Gmail through viaSocket, choose the alert channel and report recipients.'],
+    ['Connect', 'Integrations → connect Slack, Gmail and M91 through viaSocket, choose the alert channel, report recipients and the M91 channel to ring.'],
     ['Review', 'Manager Dashboard → review queue. Verify, ask to clarify (note required) or reject, with an optional 1–5 quality rating.'],
-    ['Unblock', 'Open blockers show who each person is waiting on and for how long. Slack alerts you when something needs you.'],
+    ['Unblock', 'Open blockers show who each person is waiting on and for how long. Slack alerts you when something needs you; M91 rings your phone when it can’t wait.'],
     ['Understand', 'Team Performance shows distributions and trends — no rankings. Each profile explains every score; you can adjust one with a reason.'],
     ['Report', 'Daily and weekly reports (team digest or one person) are generated, saved, and delivered to Slack and Gmail automatically.'],
   ],
@@ -37,6 +37,7 @@ const FAQ = [
   ['Why does a score say “Not enough data” or “Provisional”?', 'With fewer than 3 data points a dimension is left out instead of counted as zero. The overall is Provisional with fewer than 5 eligible or 2 reviewed tasks.'],
   ['What does the AI see, and can it change my score?', 'Only WorkLens records (task titles, outcomes, evidence, blockers). It never browses the web, never invents facts, and never computes or changes scores. Every AI text says how many records it was written from.'],
   ['What is viaSocket?', 'The service that connects WorkLens to AI, Slack and Gmail. It holds the sign-ins and runs the AI, so WorkLens stores no app passwords or AI keys.'],
+  ['What is M91, and when will it ring?', 'M91 (by MSG91) rings the manager’s phone — even on silent — until someone answers. WorkLens uses it only when a critical task is overdue or blocked, someone has been blocked for more than 2 days, or Slack/Gmail sends keep failing. Each alert stops by itself once the problem is fixed.'],
   ['My manager changed a score — can I see why?', 'Yes. Adjusted scores show “Adjusted by manager” with the reason, and the original value stays visible.'],
 ];
 
@@ -95,6 +96,7 @@ export default function HelpPage() {
             <li>AI suggests a measurable outcome for new tasks and names who a vague blocker is waiting on.</li>
             <li>Slack: blocker alerts (with a thread update when solved), work ready for review, items needing attention, report digests.</li>
             <li>Gmail: daily report at workday end, weekly analysis on Fridays.</li>
+            <li>M91 phone alerts: rings the manager when a critical task is overdue or blocked, a blocker is stuck 2+ days, or deliveries fail — and stops when it’s fixed.</li>
             <li>Everything is logged; nothing is sent twice; failures are shown, never hidden.</li>
           </ul>
           <div className="mt-3 flex gap-3 text-xs">

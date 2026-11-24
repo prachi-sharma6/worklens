@@ -177,3 +177,24 @@ describe('demo reset', () => {
     assert.equal(db.get("SELECT COUNT(*) AS n FROM integration_connections WHERE app = 'gmail'").n, 1);
   });
 });
+
+describe('outbox drain', () => {
+  test('a demo reset keeps the integrations marker, so the first event after it is not skipped as history', async () => {
+    const before = db.get("SELECT value_json FROM settings WHERE key = 'integrations_enabled_at'")?.value_json;
+    assert.ok(before, 'marker exists before the reset');
+    seedDatabase(db);
+    assert.equal(db.get("SELECT value_json FROM settings WHERE key = 'integrations_enabled_at'")?.value_json, before);
+    const id = enqueue(db, 'slack.test', { manager_id: 1 });
+    await processOne(db, db.get('SELECT * FROM integration_events WHERE id = ?', [id]));
+    assert.doesNotMatch(db.get('SELECT result_json FROM integration_events WHERE id = ?', [id]).result_json ?? '', /before viaSocket integrations were enabled/);
+  });
+
+  test('an empty drain does not jam the outbox: the next queued event still runs', async () => {
+    const { drain } = await import('../src/integrations/outbox.js');
+    db.run("UPDATE integration_events SET status = 'skipped_not_connected', attempts = 1 WHERE status = 'queued'");
+    await drain(db); // nothing to do
+    const id = db.insert('integration_events', { event_type: 'slack.test', payload_json: JSON.stringify({ manager_id: 1 }), status: 'queued', attempts: 0 });
+    await drain(db);
+    assert.equal(db.get('SELECT attempts FROM integration_events WHERE id = ?', [id]).attempts, 1, 'the event was claimed and run');
+  });
+});

@@ -5,6 +5,7 @@ import { HANDLERS, interventionItems, getConnection } from './workflows.js';
 import { getSettings, setSetting } from '../services/data.js';
 import { isoWeekStart } from '../scoring/index.js';
 import { enqueue } from '../lib/events.js';
+import { syncM91 } from './m91.js';
 
 const ENABLED_KEY = 'integrations_enabled_at';
 
@@ -39,7 +40,13 @@ let draining = null;
 export function drain(db) {
   if (draining) return draining;
   draining = (async () => {
+    // Yield first: with nothing queued the body would otherwise finish synchronously, run `finally` (draining = null)
+    // BEFORE this promise is assigned to `draining`, and leave a settled promise there — every later drain() would
+    // return it and no event would ever run again.
+    await null;
     try {
+      // Changes that just happened (a critical task blocked, a blocker resolved) open/close M91 alerts right away.
+      try { syncM91(db); } catch (e) { console.error('[m91] sync failed', e.message); }
       for (;;) {
         const rows = db.all("SELECT * FROM integration_events WHERE status = 'queued' AND attempts = 0 ORDER BY id LIMIT 5");
         if (!rows.length) break;
@@ -107,5 +114,6 @@ export function scheduleTick(db, now = new Date()) {
     const fresh = interventionItems(db, m).filter((i) => once(`intervention:${i.key}`));
     if (fresh.length) { enqueue(db, 'intervention', { manager_id: m, items: fresh }); fired.push(`intervention×${fresh.length}`); }
   }
+  fired.push(...syncM91(db, now)); // time-based conditions (overdue, stuck 48 h) and anything that cleared
   return fired;
 }

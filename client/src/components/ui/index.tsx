@@ -228,7 +228,7 @@ export function Popover({ trigger, children, align = 'left', width = 'w-80' }: {
     return () => { document.removeEventListener('mousedown', h); window.removeEventListener('keydown', k); };
   }, [open]);
   return (
-    <div className="relative inline-block" ref={ref}>
+    <div className="relative inline-block" ref={ref} data-popover-open={open || undefined}>
       {trigger({ open, toggle: () => setOpen((o) => !o) })}
       {open && (
         <div className={cx('absolute z-40 mt-1.5 max-w-[calc(100vw-2rem)] card shadow-pop p-3.5 text-xs', width, align === 'right' ? 'right-0' : 'left-0')}>

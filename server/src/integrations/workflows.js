@@ -7,6 +7,7 @@ import { getSettings, getPrefs, snapshot, taskRow, blockerRow } from '../service
 import { dailyReport, weeklyReport, insights, dk } from '../services/views.js';
 import { saveReport } from '../services/reports.js';
 import { isoWeekStart } from '../scoring/index.js';
+import { m91Connection, ANSWERS } from './m91.js';
 
 const APP_URL = () => APP_URL_CONFIG;
 const link = (path, text) => `[${text}](${APP_URL()}${path})`;
@@ -227,7 +228,50 @@ async function gmailTest(db, ev, payload) {
   return outcome({ gmail: brief(g), response: g.res ? { id: g.res.id ? 'present' : undefined, labelIds: g.res.labelIds } : undefined });
 }
 
+// ------------------------------------------------------------- 7. M91 phone alerts (conditions: integrations/m91.js)
+async function m91Run(db, managerId, eventCreatedAt, body, { feature = true } = {}) {
+  if (!vs.isConfigured()) return { skipped: 'viaSocket not configured on this server' };
+  const conn = m91Connection(db, managerId);
+  if (!conn?.script_id) return { skipped: 'M91 not connected' };
+  if (eventCreatedAt < conn.connected_at) return { skipped: 'event happened before M91 was connected' };
+  if (feature && getSettings(db).features?.m91_alerts === false) return { skipped: 'M91 phone alerts turned off in Settings' };
+  if (!conn.settings.channel_id) return { skipped: 'no M91 channel chosen yet' };
+  const res = await vs.runFlow(conn.script_id, { channel_id: conn.settings.channel_id, ...body });
+  return { sent: true, res };
+}
+/** M91 answers 2xx for "accepted", not "rang": delivered 0 on a new alert means no phone was reached (a failure). */
+function m91Outcome(s) {
+  if (!s.sent) return { status: 'skipped_not_connected', result: { m91: brief(s) } };
+  const a = s.res?.alert ?? {};
+  const result = { m91: 'sent', channel: s.res?.channel, alert_id: a.id, delivered: a.delivered, unregistered: a.unregistered, deduplicated: a.deduplicated, reopened: a.reopened };
+  if (a.delivered === 0 && !a.deduplicated) {
+    throw Object.assign(new Error('M91 accepted the alert but reached no phone: nobody in the channel has installed M91 and accepted the invite yet'), { body: result });
+  }
+  return { status: 'sent', result };
+}
+async function m91Alert(db, ev, p) {
+  const row = db.get('SELECT status FROM m91_alerts WHERE manager_id = ? AND custom_id = ? ORDER BY id DESC LIMIT 1', [p.manager_id, p.custom_id]);
+  if (row?.status === 'closed') return { status: 'skipped_not_connected', result: { reason: 'condition cleared before the alert was sent' } };
+  return m91Outcome(await m91Run(db, p.manager_id, ev.created_at, {
+    op: 'send', alert: { title: p.title, description: p.description, severity: p.severity, customId: p.custom_id, ...ANSWERS, isAutoClose: false },
+  }));
+}
+async function m91Close(db, ev, p) {
+  // Closing is allowed even when alerts were just turned off (that is why it closes).
+  const s = await m91Run(db, p.manager_id, ev.created_at, { op: 'close', custom_id: p.custom_id }, { feature: false });
+  return s.sent ? { status: 'sent', result: { m91: 'closed', reason: p.reason, already_closed: !!s.res?.already_closed } } : { status: 'skipped_not_connected', result: { m91: brief(s) } };
+}
+async function m91Test(db, ev, p) {
+  // The test M91's quickstart asks for: LOW, two answers, closes itself after the first claim.
+  return m91Outcome(await m91Run(db, p.manager_id, ev.created_at, {
+    op: 'send', alert: { title: 'WorkLens test alert', description: `This is how WorkLens will reach you when work is stuck. Nothing is wrong. ${APP_URL()}/integrations`, severity: 'LOW', ...ANSWERS, isAutoClose: true },
+  }, { feature: false }));
+}
+
 export const HANDLERS = {
+  'm91.alert': m91Alert,
+  'm91.close': m91Close,
+  'm91.test': m91Test,
   'task.created': taskCreated,
   'task.completed': taskCompleted,
   'task.resubmitted': taskResubmitted,

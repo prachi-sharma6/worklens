@@ -58,6 +58,9 @@
 
 @layer components {
   .card { @apply bg-surface border border-border rounded-2xl; animation: wl-rise .45s cubic-bezier(.2,.8,.2,1) both; }
+  /* The rise animation leaves a transform, so every card is its own stacking context: a popover opened inside one
+     card would paint under the cards after it. A card holding an open popover lifts above its neighbours. */
+  .card:has([data-popover-open]) { position: relative; z-index: 30; }
   .tnum { font-variant-numeric: tabular-nums; }
   .input { @apply w-full h-9 px-3 rounded-lg bg-surface border border-border text-fg placeholder:text-faint outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20; }
   textarea.input { @apply h-auto py-2; }

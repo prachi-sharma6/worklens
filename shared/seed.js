@@ -91,7 +91,7 @@ export const DEFAULT_SETTINGS = {
   slack_channel: null,
   report_recipients: [],
   leave_days: {},
-  features: { ai_enrichment: true, ai_blockers: true, ai_reports: true, slack_alerts: true, email_reports: true, employee_dms: true },
+  features: { ai_enrichment: true, ai_blockers: true, ai_reports: true, slack_alerts: true, email_reports: true, employee_dms: true, m91_alerts: true },
 };
 
 const ROUND_SUFFIX = ['', ' — follow-up', ' — phase 2', ' — rollout', ' — round 5'];
